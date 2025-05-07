@@ -3,33 +3,39 @@
 namespace App\Controllers;
 
 use App\Models\MascotasModel;
-use CodeIgniter\Events\Events;
 use CodeIgniter\I18n\Time;
 
 
 class Mascotas extends BaseController
 {
-    public function alta()
-    { {
-            $fechaActual = Time::now()->format('d/m/Y H:i:s');
-            $dateString = date('mdy'); //Generate a datestring.
-            $numeroAleatorio = mt_rand(1, 100);
-            $nro_registro= $numeroAleatorio.$dateString;
-            $data = [
-                'id' => rand(100, 999), // 
-                'nombre' => $this->request->getPost('nombre'),
-                'especie' => $this->request->getPost('especie'),
-                'raza' => $this->request->getPost('raza'),
-                'nro_registro' => $nro_registro,
-                'edad' => $this->request->getPost('edad'),
-                'fecha_alta' => $fechaActual,
-            ];
-            $Mascotas = new MascotasModel();
-            $Mascotas->insertar($data);
-            $this->session->setFlashdata('success', 'Se creo exitosamente');
+    public function vistas()
+    {
+        $vistas = view('header') . view('mascotas', ) . view('footer');
+        return $vistas;
 
-            return redirect()->to(base_url('/'));
-        }
+    }
+    public function alta()
+    {
+        $fechaActual = Time::now()->format('d/m/Y H:i:s');
+        $dateString = date('mdy'); //Generate a datestring.
+        $fecha = Time::now();
+        $fechaFormateada = $fecha->toLocalizedString('yyyy-MM-dd');
+        $numeroAleatorio = mt_rand(1, 1000);
+        $nro_registro = $numeroAleatorio . $dateString;
+        $data = [
+            'id' => rand(100, 999), // 
+            'nombre' => $this->request->getPost('nombre'),
+            'especie' => $this->request->getPost('especie'),
+            'raza' => $this->request->getPost('raza'),
+            'nro_registro' => $nro_registro,
+            'edad' => $this->request->getPost('edad'),
+            'fecha_alta' => $fechaFormateada,
+        ];
+        $Mascotas = new MascotasModel();
+        $Mascotas->insertar($data);
+
+        return redirect()->to(base_url('/'));
+
     }
     public function baja()
     { /* Código para eliminar relaciones */
@@ -38,6 +44,10 @@ class Mascotas extends BaseController
     { /* Código para actualizar registros */
     }
     public function mostrar()
-    { /* Código para listar información */
+    {
+        $Mascotas = new MascotasModel();
+        $datoMascota['dato'] = $Mascotas->obtenerMascotas();
+        $vistas = view('header') . view('mascotas', ['datoMascota' => $datoMascota]) . view('footer');
+        return $vistas;
     }
 }

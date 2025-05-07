@@ -20,8 +20,6 @@ class Veterinarios extends BaseController
         ];
         $Veterinario = new VeterinariosModel();
         $Veterinario->insertar($data);
-        $this->session->setFlashdata('success', 'Se creo exitosamente');
-
         return redirect()->to(base_url('/'));
     }
     public function baja()
@@ -31,6 +29,10 @@ class Veterinarios extends BaseController
     { /* Código para actualizar registros */
     }
     public function mostrar()
-    { /* Código para listar información */
+    { 
+        $Mascotas = new VeterinariosModel();
+        $data['dato'] = $Mascotas->mostrar_veterinarios();
+        $vistas = view('header') . view('mostrar', $data) . view('footer');
+        return $vistas;
     }
 }

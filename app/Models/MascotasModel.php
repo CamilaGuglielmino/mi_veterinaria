@@ -10,18 +10,18 @@ class MascotasModel extends Model{
     protected $useAutoIncrement = false;
 
     protected $returnType     = 'array';
-    protected $useSoftDeletes = true;
+    protected $useSoftDeletes = false;
 
-    protected $allowedFields = ['nombre', 'especie', 'raza', 'nro_registro', 'edad', 'fecha_defuncion'];
+    protected $allowedFields = ['nombre', 'especie', 'raza', 'nro_registro', 'edad', 'fecha_defuncion', 'fecha_modifica'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     // Dates
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
+    protected $dateFormat    = 'date';
     protected $createdField  = 'fecha_alta';
-    protected $updatedField  = 'fecha_modifica';
+    protected $updatedField  = '';
 
 
     // Validation
@@ -39,10 +39,15 @@ class MascotasModel extends Model{
     }
     public function mostrar_mascotas()
     {
-        $Noticias = $this->db->table('mascotas');
-        return $Noticias->get()->getResultArray();
+        $Mascotas = $this->db->table('mascotas');
+        return $Mascotas->get()->getResultArray();
 
     }
+    public function obtenerMascotas()
+    {
+        return $this->findAll();
+    }
+
     
     public function ordenar()
     {

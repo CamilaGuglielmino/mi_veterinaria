@@ -12,16 +12,16 @@ class AmosModel extends Model{
     protected $returnType     = 'array';
     protected $useSoftDeletes = false;
 
-    protected $allowedFields = ['nombre', 'apellido', 'direccion', 'telefono'];
+    protected $allowedFields = ['nombre', 'apellido', 'direccion', 'telefono', 'fecha_modifica'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     // Dates
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
+    protected $dateFormat    = 'date';
     protected $createdField  = 'fecha_alta';
-    protected $updatedField  = 'fecha_modifica';
+    protected $updatedField  = '';
 
     // Validation
     protected $validationRules      = [];
@@ -29,7 +29,17 @@ class AmosModel extends Model{
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
-  
+    public function insertar($data)
+    {
+
+        $this->db->table('amos')->insertBatch($data);
+
+    }
+    public function obtenerAmos()
+    {
+        return $this->findAll();
+    }
+
 }
 
 

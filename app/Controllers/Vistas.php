@@ -2,20 +2,25 @@
 namespace App\Controllers;
 
 use App\Models\AmosModel;
-use App\Models\MascotasModeldel;
-use App\Models\VeterinariosModelModel;
+use App\Models\MascotasModel;
+use App\Models\VeterinariosModel;
 
 
 class Vistas extends BaseController
 {
     public function index(): string
     {
-        $vistas = view('header') . view('inicio') . view('footer');
+        $Mascotas = new MascotasModel();
+        $datoMascota['dato'] = $Mascotas->mostrar_mascotas();
+        $vistas = view('header') . view('altas', $datoMascota) . view('footer');
         return $vistas;
+        
     }
     public function vistaAlta()
     { 
-        $vistas = view('header') . view('altas') . view('footer');
+        $Mascotas = new MascotasModel();
+        $datoMascota['dato'] = $Mascotas->mostrar_mascotas();
+        $vistas = view('header') . view('altas', $datoMascota) . view('footer');
         return $vistas;
     }
     public function vistaBaja()

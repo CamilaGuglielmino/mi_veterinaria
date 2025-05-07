@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\AmosModel;
+use CodeIgniter\I18n\Time;
 
 class Amos extends BaseController
 {
@@ -18,10 +19,10 @@ class Amos extends BaseController
                 'fecha_alta' => $fechaActual,
             ];
             $Amo = new AmosModel();
-            $$Amo->insertar($data);
-            $this->session->setFlashdata('success', 'Se creo exitosamente');
+            $Amo->insertar($data);
 
             return redirect()->to(base_url('/'));
+            
         }
     }
     public function baja()
