@@ -33,9 +33,5 @@ class Vistas extends BaseController
         $vistas = view('header') . view('modificaciones') . view('footer');
         return $vistas;
     }
-    public function vistaMostrar()
-    {
-        $vistas = view('header') . view('mostrar') . view('footer');
-        return $vistas;
-    }
+    
 }

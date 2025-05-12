@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\AmosModel;
 use App\Models\MascotasModel;
 use CodeIgniter\I18n\Time;
 
@@ -42,11 +43,29 @@ class Mascotas extends BaseController
     public function modificar()
     { /* Código para actualizar registros */
     }
+
+    /**
+     * no lo uso
+     */
     public function mostrar()
     {
+        $Amo = new AmosModel();
+        $amos['dato'] = $Amo->obtenerAmos();
         $Mascotas = new MascotasModel();
-        $datoMascota['dato'] = $Mascotas->obtenerMascotas();
-        $vistas = view('header') . view('mascotas', ['datoMascota' => $datoMascota]) . view('footer');
+        $datoMascota['dato'] = $Mascotas->mostrar_mascotas();
+        $vistas = view('header') . view('/mostrar/listadoAmos', ['amos'=> $amos]) . view('footer');
         return $vistas;
+    }
+    public function obtenerMascotas()
+    {
+        $mascotasModel = new MascotasModel();
+        // Definir la variable
+        $mascotas = [];
+        // Obtener la lista de veterinarios para el select
+        $listaMascotas = $mascotasModel->select('nro_registro, nombre')->get()->getResultArray();
+
+        return view('header') .
+            view('/mostrar/listadoMascotas', ['listaMascotas' => $listaMascotas, 'mascotas' => $mascotas]) .
+            view('footer');
     }
 }

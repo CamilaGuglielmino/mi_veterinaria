@@ -21,7 +21,7 @@
                         <select class="form-control" id="id_mascota" name="id_mascota" required>
                             <option value="">Selecciona una opción</option>
                             <?php foreach ($datoMascota['dato'] as $mascota): ?>
-                                <option value="<?= htmlspecialchars($mascota['id']) ?>">
+                                <option value="<?= htmlspecialchars($mascota['nro_registro']) ?>">
                                     <?= htmlspecialchars($mascota['nombre']) ?>
                                 </option>
                             <?php endforeach; ?>

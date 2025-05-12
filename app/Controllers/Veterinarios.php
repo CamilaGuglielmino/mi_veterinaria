@@ -45,18 +45,32 @@ class Veterinarios extends BaseController
     }
     public function mostrar()
     {
-        $veterinarioModel = new VeterinarioModel();
-        $relacionModel = new RelacionVeterinarioMascotaModel();
+        $veterinarioModel = new VeterinariosModel();
+       // $relacionModel = new RelacionVeterinarioMascotaModel();
 
         $veterinarios = $veterinarioModel->findAll();
 
         foreach ($veterinarios as &$veterinario) {
             // Buscar todas las mascotas atendidas por este veterinario
-            $mascotas = $relacionModel->where('veterinario_id', $veterinario['id'])->findAll();
+           // $mascotas = $relacionModel->where('veterinario_id', $veterinario['id'])->findAll();
             $veterinario['mascotas'] = !empty($mascotas) ? array_column($mascotas, 'nombre_mascota') : [];
         }
 
         return view('listadoVeterinarios', ['veterinarios' => $veterinarios]);
-    
+
     }
+    public function obtenerVeterinarios()
+{
+    $veterinarioModel = new VeterinariosModel();
+    
+    // Definir la variable vacía
+    $veterinarios = []; 
+
+    // Obtener la lista de veterinarios para el select
+    $listaVeterinarios = $veterinarioModel->select('id, nombre, apellido')->get()->getResultArray();
+    
+    return view('header') .
+           view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
+           view('footer');
+}
 }

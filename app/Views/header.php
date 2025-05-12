@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>VMi Veterinaria</title>
+    <title>Mi Veterinaria</title>
     <link href="css/style.css" rel="stylesheet">
 
     <script src="js/scripts.js"></script>

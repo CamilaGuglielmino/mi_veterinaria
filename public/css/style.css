@@ -569,3 +569,6 @@ button {
 .styled-table tbody tr:hover {
     background-color: #ddd;
 }
+.hidden {
+    display: none;
+}

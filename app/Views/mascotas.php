@@ -23,7 +23,7 @@
                             <?php if (!empty($datoMascota['dato'])): ?>
                                 <?php foreach ($datoMascota['dato'] as $mascota): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($mascota['id']) ?></td>
+                                        <td><?= htmlspecialchars($mascota['nro_registro']) ?></td>
                                         <td><?= htmlspecialchars($mascota['nombre']) ?></td>
                                         <td><?= htmlspecialchars($mascota['especie']) ?></td>
                                         <td><?= htmlspecialchars($mascota['edad']) ?></td>

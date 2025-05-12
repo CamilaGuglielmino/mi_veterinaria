@@ -23,7 +23,7 @@ class Amos extends BaseController
             $Amo->insertar($data);
 
             return redirect()->to(base_url('/'));
-            
+
         }
     }
     public function baja()
@@ -33,7 +33,8 @@ class Amos extends BaseController
     { /* Código para actualizar registros */
     }
     public function mostrar()
-    {   $amoModel = new AmosModel();
+    {
+        $amoModel = new AmosModel();
         $relacionModel = new VinculosModel();
 
         $amos = $amoModel->findAll();
@@ -46,5 +47,17 @@ class Amos extends BaseController
 
         return view('listadoAmos', ['amos' => $amos]);
 
+    }
+    public function obtenerAmos()
+    {
+        $amoModel = new AmosModel();
+        // Definir la variable
+        $amos = [];
+        // Obtener la lista de veterinarios para el select
+        $listaAmos = $amoModel->select('id, nombre, apellido')->get()->getResultArray();
+
+        return view('header') .
+            view('/mostrar/listadoAmos', ['listaAmos' => $listaAmos, 'amos' => $amos]) .
+            view('footer');
     }
 }
