@@ -10,24 +10,23 @@ class Mascotas extends BaseController
 {
     public function vistas()
     {
-        $vistas = view('header') . view('mascotas', ) . view('footer');
+        $vistas = view('header') . view('inicio', ) . view('footer');
         return $vistas;
 
     }
     public function alta()
     {
-        $fechaActual = Time::now()->format('d/m/Y H:i:s');
+        
         $dateString = date('mdy'); //Generate a datestring.
         $fecha = Time::now();
         $fechaFormateada = $fecha->toLocalizedString('yyyy-MM-dd');
         $numeroAleatorio = mt_rand(1, 1000);
         $nro_registro = $numeroAleatorio . $dateString;
         $data = [
-            'id' => rand(100, 999), // 
+            'nro_registro' => $nro_registro,
             'nombre' => $this->request->getPost('nombre'),
             'especie' => $this->request->getPost('especie'),
             'raza' => $this->request->getPost('raza'),
-            'nro_registro' => $nro_registro,
             'edad' => $this->request->getPost('edad'),
             'fecha_alta' => $fechaFormateada,
         ];

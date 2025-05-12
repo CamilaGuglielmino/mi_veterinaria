@@ -1,202 +1,135 @@
-<!--En la vista Alta, deberá permitir registrar un par Amo- Mascota. Si ambos ya
-están cargados, solo se deberá cargar la relación Amo-Mascota, en caso
-contrario, previamente se deberá dar de alta el amo y/o la mascota. En el caso
-de los veterinarios, deberá registrar los datos personales y especialidad de un
-nuevo médico veterinario. 
--->
-<script src="js/scripts.js"></script>
-
+<?php $session = session(); ?>
+<?php $validation = session('validation'); ?>
 
 <body>
     <main>
-        <div class="container" id="container">
-            <div class="button">
-                <button class="btn" data-number="1">Amos-Mascotas</button>
-                <button class="btn" data-number="2">Mascotas-Veterinarios</button>
-                <button class="btn" data-number="3">AMOS</button>
-                <button class="btn" data-number="4">MASCOTAS</button>
-                <button class="btn" data-number="5">VETERINARIOS</button>
+        <nav class="nav">
+            <ul class="nav-n">
+                <li class="lista-interna"><a href="<?php echo base_url('altas') ?>">Mascotas y Amos</a></li>
+                <li class="lista-interna"><a href="<?php echo base_url('altasVeterinario') ?>">Veterinarios</a></li>
+            </ul>
+        </nav>
 
-            </div>
+        <div class="tab-content">
+            <div id="vinculos" class="tab-pane active">
+                <form action="<?php echo base_url('VinculoMascotaAmo/alta') ?>" method="POST">
+                    <p class="titulos">Mascotas y Amos</p>
 
-            <div class="content">
-                <div class="content_text block" data-seccion="1">
-                    <h2 class="title">Vinculo Mascota-Amo</h2>
-                    <form action="<?php echo base_url('Mascotas/alta') ?>" method="POST">
-                       
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre de la Mascota</label>
-                                <select class="form-control" id="nombre" name="nombre" required>
-                                    <option value="">Selecciona una opción</option>
-                                    <?php 
-                                    if (!empty($mascotas)):
-                                        foreach ($mascotas as $mascota): ?>
-                                        <option value="<?= htmlspecialchars($mascota['nombre']) ?>">
-                                            <?= htmlspecialchars($mascota['nombre']) ?></option>
-                                    <?php endforeach;?>
-                                    <?php else: ?>
-                                        <option value="">No hay mascotas registradas</option>
-                                    <?php endif; ?>
-                                </select>
-                                <button class="btn">Registrar Mascota</button>
-                            </div>
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre del Amo</label>
-                                <select class="form-control" id="nombre" name="nombre" required>
-                                    <option value="">Selecciona una opción</option>
-                                    <?php 
-                                    if (!empty($mascotas)):
-                                        foreach ($mascotas as $mascota): ?>
-                                        <option value="<?= htmlspecialchars($mascota['nombre']) ?>">
-                                            <?= htmlspecialchars($mascota['nombre']) ?></option>
-                                    <?php endforeach;?>
-                                    <?php else: ?>
-                                        <option value="">No hay Amos registrados</option>
-                                    <?php endif; ?>
-                                </select>
-                                <button class="btn">Registrar Amo</button>
-                            </div>
+                    <!-- Selección de mascota -->
+                    <div class="mb-3">
+                        <label for="id_mascota" class="form-label">Nombre de la Mascota</label>
+                        <select class="form-control" id="id_mascota" name="id_mascota" required>
+                            <option value="">Selecciona una opción</option>
+                            <?php foreach ($datoMascota['dato'] as $mascota): ?>
+                                <option value="<?= htmlspecialchars($mascota['id']) ?>">
+                                    <?= htmlspecialchars($mascota['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                        <button type="submit" class="btn">Registrar Vinculo</button>
-                    </form>
+                        <h6>Si la mascota no está registrada, <button type="button"
+                                onclick="mostrarModal('mascotaModal')">
+                                Registrar Mascota
+                            </button></h6>
+                    </div>
 
-                </div>
-                <div class="content_text" data-seccion="2">
-                    <h2 class="title">Vinculo Mascota-Veterinario</h2>
-                    <form action="<?php echo base_url('Mascotas/alta') ?>" method="POST">
-                       
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre de la Mascota</label>
-                                <select class="form-control" id="nombre" name="nombre" required>
-                                    <option value="">Selecciona una opción</option>
-                                    <?php 
-                                    if (!empty($mascotas)):
-                                        foreach ($mascotas as $mascota): ?>
-                                        <option value="<?= htmlspecialchars($mascota['nombre']) ?>">
-                                            <?= htmlspecialchars($mascota['nombre']) ?></option>
-                                    <?php endforeach;?>
-                                    <?php else: ?>
-                                        <option value="">No hay mascotas registradas</option>
-                                    <?php endif; ?>
-                                </select>
-                                <button class="btn">Registrar Mascota</button>
-                            </div>
-                            <div class="mb-3">
-                                <label for="nombre" class="form-label">Nombre del Amo</label>
-                                <select class="form-control" id="nombre" name="nombre" required>
-                                    <option value="">Selecciona una opción</option>
-                                    <?php 
-                                    if (!empty($mascotas)):
-                                        foreach ($mascotas as $mascota): ?>
-                                        <option value="<?= htmlspecialchars($mascota['nombre']) ?>">
-                                            <?= htmlspecialchars($mascota['nombre']) ?></option>
-                                    <?php endforeach;?>
-                                    <?php else: ?>
-                                        <option value="">No hay Veterinarios registrados</option>
-                                    <?php endif; ?>
-                                </select>
-                                <button class="btn">Registrar Registar Veterinario</button>
-                            </div>
+                    <!-- Selección de amo -->
+                    <div class="mb-3">
+                        <label for="id_amo" class="form-label">Nombre del Amo</label>
+                        <select class="form-control" id="id_amo" name="id_amo" required>
+                            <option value="">Selecciona una opción</option>
+                            <?php foreach ($datoAmo['dato'] as $amo): ?>
+                                <option value="<?= htmlspecialchars($amo['id']) ?>">
+                                    <?= htmlspecialchars($amo['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <h6>Si la Propietario no está registrado, <button type="button"
+                                onclick="mostrarModal('amoModal')">
+                                Registrar Mascota
+                            </button></h6>
+                    </div>
 
-                        <button type="submit" class="btn">Registrar Vinculo</button>
-                    </form>
-
-                    </b>
-                </div>
-                <div class="content_text" data-seccion="3">
-                    <h2 class="title">AMOS</h2>
-                    <form action="<?php echo base_url('Amos/alta') ?>" method="POST">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre: </label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="apellido" class="form-label">Apellido: </label>
-                                <input type="text" class="form-control" id="apellido" name="apellido" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección: </label>
-                                <input type="text" class="form-control" id="direccion" name="direccion" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="telefono" class="form-label">Teléfono: </label>
-                                <input type="int" class="form-control" id="telefono" name="telefono" required>
-                        </div>
-
-                        <button type="submit" class="btn">Registrar Amo</button>
-                    </form>
-
-                </div>
-
-                <div class="content_text" data-seccion="4">
-                    <h2 class="title">MASCOTAS</h2>
-                    <form action="<?php echo base_url('Mascotas/alta') ?>" method="POST">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre de la Mascota</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="especie" class="form-label">Especie</label>
-                            <select class="form-control" id="especie" name="especie" required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="Perro">Perro</option>
-                                <option value="Gato">Gato</option>
-                                <option value="Ave">Roedores</option>
-                                <option value="Ave">Peces</option>
-                                <option value="Ave">Ave</option>
-                                <option value="Ave">Reptiles</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="raza" class="form-label">Raza</label>
-                            <input type="text" class="form-control" id="raza" name="raza">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edad" class="form-label">Edad</label>
-                            <input type="number" class="form-control" id="edad" name="edad" min="0" required>
-                        </div>
-                        <button type="submit" class="btn">Registrar Mascota</button>
-                    </form>
-
-                </div>
-                <div class="content_text" data-seccion="5">
-                    <h2 class=" title">VETERINARIOS</h2>
-                    <form action="<?php echo base_url('Veterinarios/alta') ?>" method="POST">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre: </label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="apellido" class="form-label">Apellido: </label>
-                                <input type="text" class="form-control" id="apellido" name="apellido" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="especialidad" class="form-label">Especialidad:</label>
-                            <select class="form-control" id="especialidad" name="especialidad" required>
-                                <option value="">Selecciona una opción</option>
-                                <option value="Perro">Animales de domesticos</option>
-                                <option value="Gato">Animales de producción</option>
-                                <option value="Ave">Animales exóticos</option>
-                                <option value="Ave">Especialidades clínicas</option>
-                                <option value="Ave">Especialidades de laboratorio</option>
-                                <option value="Ave">Salud pública veterinaria</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="telefono" class="form-label">Teléfono:</label>
-                            <input type="int" class="form-control" id="telefono" name="telefono">
-                        </div>
-                        <button type="submit" class="btn">Registrar Veterinario</button>
-                    </form>
-
-                </div>
+                    <button type="submit" id="tabla">Registrar Vínculo</button>
+                </form>
             </div>
         </div>
-        </div>
-
-        <script src="js/scripts.js"></script>
-
     </main>
+
+    <!-- Modal de Mascota -->
+    <div id="mascotaModal" class="modal">
+        <div class="modal-contenido">
+            <span onclick="cerrarModal('mascotaModal')" class="cerrar">&times;</span>
+            <h2>Registrar Mascota</h2>
+            <form action="<?php echo base_url('Mascotas/alta') ?>" method="POST">
+                <label for="nombre">Nombre:</label>
+                <input type="text" name="nombre" required>
+
+                <label for="especie">Especie:</label>
+                <select name="especie">
+                    <option value="Perro">Perro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Ave">Ave</option>
+                    <option value="Reptil">Reptil</option>
+                </select>
+
+                <label for="raza">Raza:</label>
+                <input type="text" name="raza">
+
+                <label for="edad">Edad:</label>
+                <input type="number" name="edad">
+
+                <button type="submit">Registrar Mascota</button>
+            </form>
+        </div>
+    </div>
+    <!-- Modal de Amo -->
+    <div id="amoModal" class="modal">
+        <div class="modal-contenido">
+            <span onclick="cerrarModal('amoModal')" class="cerrar">&times;</span>
+            <h2>Registrar Mascota</h2>
+            <form action="<?php echo base_url('Amos/alta') ?>" method="POST">
+                <label for="raza" class="form-label">Nombre:</label>
+                <input type="text" name="nombre" placeholder="Nombre" required>
+                <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
+                    <span class="help-block"><?= esc($validation->getError('nombre')) ?></span>
+                <?php endif; ?>
+                <label for="raza" class="form-label">Apellido:</label>
+                <input type="text" name="apellido" placeholder="Apellido" required>
+                <?php if (!empty($validation) && $validation->hasError('apellido')): ?>
+                    <span class="help-block"><?= esc($validation->getError('apellido')) ?></span>
+                <?php endif; ?>
+                <label for="raza" class="form-label">Telefono:</label>
+                <input type="text" name="telefono" placeholder="Teléfono">
+                <?php if (!empty($validation) && $validation->hasError('telefono')): ?>
+                    <span class="help-block"><?= esc($validation->getError('telefono')) ?></span>
+                <?php endif; ?>
+                <button type="submit" id="tabla">Registrar Propietario</button>
+            </form>
+
+        </div>
+    </div>
+    <!-- Estilos -->
+    <style>
+       
+    </style>
+
+    <!-- Scripts -->
+    <script>
+        function mostrarModal(id) {
+            document.getElementById(id).style.display = "flex";
+        }
+
+        function cerrarModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Cerrar modal con la tecla ESC
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                cerrarModal("mascotaModal");
+                cerrarModal("amoModal");
+            }
+        });
+    </script>
 </body>

@@ -143,7 +143,7 @@ header {
 }
 
 .right img {
-    width: 1.5rem;
+    width: 3.5rem;
     margin: 0.5rem;
 }
 
@@ -355,3 +355,181 @@ tr:hover {
 }
 
 
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+/* Contenedor principal */
+.tab-content {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+/* Titulos */
+p {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Etiquetas */
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Campos de entrada */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Botón de envío */
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Espaciado entre secciones */
+.mb-3 {
+    margin-bottom: 15px;
+}
+
+/* Ocultar formularios adicionales */
+#mascotaForm,
+#amoForm {
+    display: none;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+/* Mantener el nav fijo en la parte superior */
+.nav-interno {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f9f9f9; /* Ajusta el color según tu diseño */
+    padding: 10px 0;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Ajustar el contenido para evitar que quede debajo del nav */
+.tab-content {
+    margin-top: 60px; /* Ajusta según la altura del nav */
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    overflow: auto;
+    max-height: calc(100vh - 70px); /* Ajustar altura para permitir scroll */
+}
+
+/* Mejorar el efecto scroll */
+.tab-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+ .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* Asegura que esté por encima de todo */
+        }
+
+        .modal-contenido {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            position: relative;
+            z-index: 10000;
+            /* Mayor que el fondo del modal */
+        }
+
+        .cerrar {
+            cursor: pointer;
+            float: right;
+            font-size: 24px;
+        }
+
+        .nav {
+            background-color: #0077cc;
+            /* Color de fondo */
+            padding: 10px 0;
+            width: 100%;
+            position: relative;
+            /* Mantener dentro del body */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-n {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .lista-interna {
+            display: inline-block;
+        }
+
+        .lista-interna a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .lista-interna a:hover {
+            background-color: #005faa;
+            /* Cambio de color al pasar el mouse */
+        }
+
+        /* Responsividad */
+        @media (max-width: 600px) {
+            .nav-n {
+                flex-direction: column;
+                align-items: center;
+            }
+        }

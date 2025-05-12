@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Veterinaria CG</title>
+    <title>VMi Veterinaria</title>
     <link href="css/style.css" rel="stylesheet">
 
     <script src="js/scripts.js"></script>
@@ -19,17 +19,14 @@
 
             </div>
         </div>
-        <div class="brand">
-            <a href="<?php echo base_url('inicio') ?>">
-                <img src="icons/icons/udemy.svg" alt="icon-udemy" class="logo">
-                <span class="name">Veterinaria</span>
-            </a>
-        </div>
+       
 
     </div>
     <div class="right">
 
-        <img src="icons/icons/usuario.png" alt="usuario">
+        <a href="<?php echo base_url('/'); ?>">
+    <img src="icons/icons/logo.png" alt="logo">
+</a>
 
     </div>
 </header>
@@ -61,11 +58,7 @@
                     <span>Mostrar</span>
                 </a>
             </li>
-            <a href="<?php echo base_url('mascotas') ?>">
-
-                <img src="icons/icons/search.svg" alt="">
-                <span>Mascotas</span>
-            </a>
+            
             </li>
         </ul>
     </nav>

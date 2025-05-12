@@ -36,7 +36,7 @@ class VeterinariosModel extends Model{
         $this->db->table('veterinarios')->insertBatch($data);
 
     }
-    public function obtenerAmos()
+    public function obtenerVeterinario()
     {
         return $this->findAll();
     }
