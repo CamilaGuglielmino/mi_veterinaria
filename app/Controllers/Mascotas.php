@@ -20,7 +20,7 @@ class Mascotas extends BaseController
         $dateString = date('mdy'); //Generate a datestring.
         $fecha = Time::now();
         $fechaFormateada = $fecha->toLocalizedString('yyyy-MM-dd');
-        $numeroAleatorio = mt_rand(1, 1000);
+        $numeroAleatorio = mt_rand(1, 100);
         $nro_registro = $numeroAleatorio . $dateString;
         $data = [
             'nro_registro' => $nro_registro,
