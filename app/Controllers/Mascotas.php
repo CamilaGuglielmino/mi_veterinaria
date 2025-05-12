@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\AmosModel;
 use App\Models\MascotasModel;
+use App\Models\VinculosModel;
 use CodeIgniter\I18n\Time;
 
 
@@ -35,11 +36,36 @@ class Mascotas extends BaseController
         $Mascotas->insertar($data);
 
         return redirect()->to(base_url('/'));
+ 
+    }
+public function bajaMascota()
+{
+    $relacionModel = new VinculosModel();
+    $mascotaModel = new MascotasModel();
+    
+    $mascotaId = $this->request->getPost('mascota_id');
+    $motivo = $this->request->getPost('motivo');
+    $fecha = Time::now();
+    $fechaFormateada = $fecha->toLocalizedString('yyyy-MM-dd');
+    $fecha_fin = $fechaFormateada; 
 
+    if (!empty($mascotaId)) { 
+        if ($motivo === 'fallecimiento') {
+            $mascotaModel->where('nro_registro', $mascotaId)->
+            update( ['fecha_defuncion' => $fecha_fin]);
+        }
+        $relacionModel->where('mascota_id', $mascotaId)->update(['fecha_fin' => $fecha_fin]);
+
+        $mensaje = "Baja de la mascota registrada exitosamente.";
+    } else {
+        $mensaje = "Error: No se recibió un ID válido.";
     }
-    public function baja()
-    { /* Código para eliminar relaciones */
-    }
+
+    return view('header') .
+           view('bajas/bajaVinculos', ['mensaje' => $mensaje]) .
+           view('footer');
+}
+
     public function modificar()
     { /* Código para actualizar registros */
     }

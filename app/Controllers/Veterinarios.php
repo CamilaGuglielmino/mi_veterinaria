@@ -37,40 +37,34 @@ class Veterinarios extends BaseController
             return redirect()->back()->withInput()->with('validation', $this->validator);
         }
     }
-    public function baja()
-    { /* Código para eliminar relaciones */
+    public function bajaVeterinario()
+    {
+        $veterinarioModel = new VeterinariosModel();
+
+        $veterinarioId = $this->request->getPost('veterinario_id');
+        $fecha_fin = date('Y-m-d');
+
+        // Registrar fecha de baja en la relación del veterinario con la clínica
+        $veterinarioModel->update($veterinarioId, ['fecha_fin' => $fecha_fin]);
+
+        return redirect()->to('/mostrarVeterinarios')->with('mensaje', 'Baja del veterinario registrada');
     }
     public function modificar()
     { /* Código para actualizar registros */
     }
-    public function mostrar()
+
+    public function obtenerVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();
-       // $relacionModel = new RelacionVeterinarioMascotaModel();
 
-        $veterinarios = $veterinarioModel->findAll();
+        // Definir la variable vacía
+        $veterinarios = [];
 
-        foreach ($veterinarios as &$veterinario) {
-            // Buscar todas las mascotas atendidas por este veterinario
-           // $mascotas = $relacionModel->where('veterinario_id', $veterinario['id'])->findAll();
-            $veterinario['mascotas'] = !empty($mascotas) ? array_column($mascotas, 'nombre_mascota') : [];
-        }
+        // Obtener la lista de veterinarios para el select
+        $listaVeterinarios = $veterinarioModel->select('id, nombre, apellido')->get()->getResultArray();
 
-        return view('listadoVeterinarios', ['veterinarios' => $veterinarios]);
-
+        return view('header') .
+            view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
+            view('footer');
     }
-    public function obtenerVeterinarios()
-{
-    $veterinarioModel = new VeterinariosModel();
-    
-    // Definir la variable vacía
-    $veterinarios = []; 
-
-    // Obtener la lista de veterinarios para el select
-    $listaVeterinarios = $veterinarioModel->select('id, nombre, apellido')->get()->getResultArray();
-    
-    return view('header') .
-           view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
-           view('footer');
-}
 }
