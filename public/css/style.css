@@ -224,7 +224,7 @@ header {
 }
 
 .container {
-    
+
     width: 100%;
 }
 
@@ -243,12 +243,13 @@ header {
     background-color: var(--text-title-color);
     font-size: 1em;
     border-radius: 5px;
-    
+
 }
 
 .btn:focus {
     background-color: var(--background-hover);
 }
+
 .btn:hover {
     background-color: var(--background-hover);
 }
@@ -278,6 +279,7 @@ header {
     transform: scale(1);
     z-index: 10;
 }
+
 form {
     max-width: 400px;
     background: #fff;
@@ -302,6 +304,7 @@ form {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
 /* Estilos generales */
 body {
     font-family: Arial, sans-serif;
@@ -326,7 +329,8 @@ table {
     margin-top: 10px;
 }
 
-th, td {
+th,
+td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -386,7 +390,8 @@ label {
 }
 
 /* Campos de entrada */
-input, select {
+input,
+select {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
@@ -422,13 +427,15 @@ button {
     margin-top: 10px;
     background-color: #ffffff;
 }
+
 /* Mantener el nav fijo en la parte superior */
 .nav-interno {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #f9f9f9; /* Ajusta el color según tu diseño */
+    background-color: #f9f9f9;
+    /* Ajusta el color según tu diseño */
     padding: 10px 0;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
@@ -436,7 +443,8 @@ button {
 
 /* Ajustar el contenido para evitar que quede debajo del nav */
 .tab-content {
-    margin-top: 60px; /* Ajusta según la altura del nav */
+    margin-top: 60px;
+    /* Ajusta según la altura del nav */
     max-width: 600px;
     margin: auto;
     padding: 20px;
@@ -444,7 +452,8 @@ button {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     background-color: #f9f9f9;
     overflow: auto;
-    max-height: calc(100vh - 70px); /* Ajustar altura para permitir scroll */
+    max-height: calc(100vh - 70px);
+    /* Ajustar altura para permitir scroll */
 }
 
 /* Mejorar el efecto scroll */
@@ -460,76 +469,103 @@ button {
 .tab-content::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
- .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            /* Asegura que esté por encima de todo */
-        }
 
-        .modal-contenido {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            position: relative;
-            z-index: 10000;
-            /* Mayor que el fondo del modal */
-        }
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* Asegura que esté por encima de todo */
+}
 
-        .cerrar {
-            cursor: pointer;
-            float: right;
-            font-size: 24px;
-        }
+.modal-contenido {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    position: relative;
+    z-index: 10000;
+    /* Mayor que el fondo del modal */
+}
 
-        .nav {
-            background-color: #0077cc;
-            /* Color de fondo */
-            padding: 10px 0;
-            width: 100%;
-            position: relative;
-            /* Mantener dentro del body */
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-        }
+.cerrar {
+    cursor: pointer;
+    float: right;
+    font-size: 24px;
+}
 
-        .nav-n {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 0;
-            margin: 0;
-        }
+.nav {
+    background-color: #0077cc;
+    /* Color de fondo */
+    padding: 10px 0;
+    width: 100%;
+    position: relative;
+    /* Mantener dentro del body */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
 
-        .lista-interna {
-            display: inline-block;
-        }
+.nav-n {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
 
-        .lista-interna a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease-in-out;
-        }
+.lista-interna {
+    display: inline-block;
+}
 
-        .lista-interna a:hover {
-            background-color: #005faa;
-            /* Cambio de color al pasar el mouse */
-        }
+.lista-interna a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
+}
 
-        /* Responsividad */
-        @media (max-width: 600px) {
-            .nav-n {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
+.lista-interna a:hover {
+    background-color: #005faa;
+    /* Cambio de color al pasar el mouse */
+}
+
+/* Responsividad */
+@media (max-width: 600px) {
+    .nav-n {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.styled-table th, .styled-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.styled-table thead {
+    background-color: #007bff; /* Puedes cambiarlo según el contexto */
+    color: #ffffff;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #ddd;
+}

@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\AmosModel;
+use App\Models\VinculosModel;
 use CodeIgniter\I18n\Time;
 
 class Amos extends BaseController
@@ -32,6 +33,18 @@ class Amos extends BaseController
     { /* Código para actualizar registros */
     }
     public function mostrar()
-    { /* Código para listar información */
+    {   $amoModel = new AmosModel();
+        $relacionModel = new VinculosModel();
+
+        $amos = $amoModel->findAll();
+
+        foreach ($amos as &$amo) {
+            // Buscar todas las mascotas asociadas a este amo
+            $mascotas = $relacionModel->where('amo_id', $amo['id'])->findAll();
+            $amo['mascotas'] = !empty($mascotas) ? array_column($mascotas, 'nombre_mascota') : [];
+        }
+
+        return view('listadoAmos', ['amos' => $amos]);
+
     }
 }
