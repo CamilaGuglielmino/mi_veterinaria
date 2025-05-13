@@ -1,3 +1,8 @@
+<?php if (isset($mensaje) && !empty($mensaje)): ?>
+    <p class="success-message"><?= esc($mensaje) ?></p>
+<?php endif; ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 

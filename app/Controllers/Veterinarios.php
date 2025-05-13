@@ -10,7 +10,7 @@ class Veterinarios extends BaseController
     {
         $veterinario = new VeterinariosModel();
         $datoVeterinario = $veterinario->obtenerVeterinario();
-        $vistas = view('header') . view('altasVeterinario', ['datoVeterinario' => $datoVeterinario]) . view('footer');
+        $vistas = view('header') . view('altas/altasVeterinario', ['datoVeterinario' => $datoVeterinario]) . view('footer');
         return $vistas;
     }
 
@@ -18,40 +18,35 @@ class Veterinarios extends BaseController
     {
         $Veterinario = new VeterinariosModel();
 
-        if ($this->validate($Veterinario->validationRules, $Veterinario->validationMessages)) {
-            $fecha = Time::now();
-            $fechaFormateada = $fecha->toLocalizedString('yyyy-MM-dd');
-
-            $data = [
-                'id' => rand(100, 999),
-                'nombre' => $this->request->getPost('nombre'),
-                'apellido' => $this->request->getPost('apellido'),
-                'especialidad' => $this->request->getPost('especialidad'),
-                'telefono' => $this->request->getPost('telefono'),
-                'fecha_ingreso' => $fechaFormateada,
-            ];
-
-            $Veterinario->insertar($data);
-            return redirect()->to(base_url('/'));
-        } else {
-            return redirect()->back()->withInput()->with('validation', $this->validator);
+        // Verificar validación antes de insertar
+        if (!$this->validate($Veterinario->validationRules, $Veterinario->validationMessages)) {
+            return view('header')
+                . view('altas/altasVeterinario', [
+                    'validation' => $this->validator
+                ])
+                . view('footer');
         }
-    }
-    public function bajaVeterinario()
-    {
-        $veterinarioModel = new VeterinariosModel();
 
-        $veterinarioId = $this->request->getPost('veterinario_id');
-        $fecha_fin = date('Y-m-d');
+        // Formatear fecha actual
+        $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
 
-        // Registrar fecha de baja en la relación del veterinario con la clínica
-        $veterinarioModel->update($veterinarioId, ['fecha_fin' => $fecha_fin]);
+        // Datos a insertar
+        $data = [
+            'nombre' => $this->request->getPost('nombre'),
+            'apellido' => $this->request->getPost('apellido'),
+            'especialidad' => $this->request->getPost('especialidad'),
+            'telefono' => $this->request->getPost('telefono'),
+            'fecha_ingreso' => $fecha,
+            'estado' => 1,
+        ];
 
-        return redirect()->to('/mostrarVeterinarios')->with('mensaje', 'Baja del veterinario registrada');
+        // Insertar en la base de datos
+        $Veterinario->insert($data);
+
+        // Redirigir a la página principal
+        return redirect()->to(base_url('/'));
     }
-    public function modificar()
-    { /* Código para actualizar registros */
-    }
+
 
     public function obtenerVeterinarios()
     {
@@ -61,10 +56,104 @@ class Veterinarios extends BaseController
         $veterinarios = [];
 
         // Obtener la lista de veterinarios para el select
-        $listaVeterinarios = $veterinarioModel->select('id, nombre, apellido')->get()->getResultArray();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
 
         return view('header') .
             view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
+            view('footer');
+    }
+    public function cargarBajaVeterinarios()
+    {
+        $veterinarioModel = new VeterinariosModel();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
+        $veterinario = $veterinarioModel->obtener();
+
+        return view('header') .
+            view('bajas/bajaVeterinario', ['veterinario' => $veterinario, 'listaVeterinarios' => $listaVeterinarios]) .
+            view('footer');
+    }
+
+
+    public function bajaVeterinarios()
+    {
+        $veterinarioModel = new VeterinariosModel();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
+
+
+        $veterinariosId = $this->request->getPost('veterinario_id');
+        $fecha = $this->request->getPost('fecha_fin');
+
+
+        if (!empty($veterinariosId)) {
+            // Ejecutar la actualización de fecha de egreso y estado
+            $resultado = $veterinarioModel->set([
+                'fecha_egreso' => $fecha,
+                'estado' => 2
+            ])
+                ->where('id', $veterinariosId)
+                ->update();
+
+            if ($resultado) {
+                $mensaje = "Baja del veterinario exitosa.";
+            } else {
+                $mensaje = "Error: No se pudo actualizar la base de datos.";
+            }
+        } else {
+            $mensaje = "Error: No se recibió un ID válido.";
+        }
+
+        return view('header') .
+            view('bajas/bajaVeterinario', ['mensaje' => $mensaje, 'listaVeterinarios' => $listaVeterinarios]) .
+            view('footer');
+    }
+    public function vistaModificar()
+    {
+        $veterinarioModel = new VeterinariosModel();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
+
+        $vistas = view('header') .
+            view('modificaciones/modificarVeterinario', ['listaVeterinarios' => $listaVeterinarios]) .
+            view('footer');
+        return $vistas;
+    }
+    public function modificar()
+    {
+        $veterinarioModel = new VeterinariosModel();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
+
+
+        $veterinarioId = $this->request->getPost('veterinario_id');
+        $nombre = $this->request->getPost('nombre');
+        $apellido = $this->request->getPost('apellido');
+        $especialidad = $this->request->getPost('especialidad');
+        $telefono = $this->request->getPost('telefono');
+        $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
+
+
+        if (!empty($veterinarioId)) {
+            // Actualizar datos del amo
+            $resultado = $veterinarioModel->set([
+                'nombre' => $nombre,
+                'apellido' => $apellido,
+                'especialidad' => $especialidad,
+                'telefono' => $telefono,
+                'fecha_modifica' => $fecha
+            ])
+                ->where('id', $veterinarioId)
+                ->update();
+
+            // Verificar si se actualizó correctamente
+            if ($resultado) {
+                $mensaje = "Datos del amo actualizados correctamente.";
+            } else {
+                $mensaje = "Error: No se pudo modificar la información.";
+            }
+        } else {
+            $mensaje = "Error: No se recibió un ID válido.";
+        }
+
+        return view('header') .
+            view('modificaciones/modificarVeterinario', ['mensaje' => $mensaje, 'listaVeterinarios' => $listaVeterinarios]) .
             view('footer');
     }
 }

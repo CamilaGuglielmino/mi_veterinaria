@@ -58,6 +58,30 @@ class AmosModel extends Model
     }
     public function obtenerAmos()
     {
+        $Amos = $this->db->table('amos');
+        return $Amos->get()->getResultArray();
+    }
+    public function obtenertodo()
+    {
         return $this->findAll();
     }
+    public function obtenerAmo()
+    {
+        return $this->db->table('amos')
+            ->select('amos.*, GROUP_CONCAT(mascotas.nombre SEPARATOR ", ") AS mascotas')
+            ->join('amo_mascota', 'amos.id = amo_mascota.amo_id', 'left')
+            ->join('mascotas', 'amo_mascota.mascota_id = mascotas.nro_registro', 'left')
+            ->groupBy('amos.id');
+    }
+
+    public function obtenerListaAmos()
+    {
+        return $this->db->table('amos')
+            ->select('id, nombre, apellido, direccion, telefono')
+            ->get()
+            ->getResultArray();
+    }
+
+
+
 }

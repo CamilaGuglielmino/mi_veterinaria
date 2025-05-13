@@ -48,7 +48,7 @@
                             <td><?= esc($mascota['fecha_alta']) ?></td>
                             <td><?= esc($mascota['fecha_defuncion'] ?: 'N/A') ?></td>
                             <td>
-                                <?= isset($mascota['amos']) && !empty($mascota['amos']) ? implode(', ', $mascota['amos']) : 'Sin historial' ?>
+                                <?= isset($mascota['amos']) && !empty($mascota['amos']) ? $mascota['amos'] : 'Sin historial' ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

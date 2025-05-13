@@ -14,7 +14,7 @@
             <label for="amo">Seleccionar amo:</label>
             <select name="amo" id="amo">
                 <option value="">--Seleccione--</option>
-                <option value="todos">Ver Todos</option> <!-- Opción para mostrar todos -->
+                <option value="todos">Ver Todos</option>
                 <?php foreach ($listaAmos as $amo): ?>
                     <option value="<?= esc($amo['id']) ?>" <?= isset($amoId) && $amoId == $amo['id'] ? 'selected' : '' ?>>
                         <?= esc($amo['nombre']) ?>     <?= esc($amo['apellido']) ?>
@@ -23,6 +23,8 @@
             </select>
             <button type="submit">Buscar</button>
         </form>
+
+        
         <?php if (!empty($amos)): ?> <!-- Solo se muestra si hay resultados -->
             <table class="styled-table">
                 <thead>

@@ -1,5 +1,8 @@
-<?php $session = session(); ?>
 
+<?php $validation = isset($validation) ? $validation : \Config\Services::validation(); ?>
+<?php if (isset($mensaje)): ?>
+    <p class="success-message"><?= esc($mensaje) ?></p>
+<?php endif; ?>
 <body>
     <main>
         <nav class="nav">
@@ -10,7 +13,7 @@
         </nav>
         <div class="tab-content">
             <div id="veterinarios" class="tab-pane active">
-                <form action="<?php echo base_url('Veterinarios/alta') ?>" method="POST">
+                <form action="<?php echo base_url('formularioAlta') ?>" method="POST">
                     <p class="titulos">Médicos Veterinarios</p>
                     <div class="mb-3"><label for="nombre" class="form-label">Nombre:</label><input type="text"
                             class="form-control" id="nombre" name="nombre" value="<?= old('nombre') ?>"

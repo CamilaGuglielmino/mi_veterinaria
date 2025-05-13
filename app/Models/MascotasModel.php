@@ -103,6 +103,27 @@ class MascotasModel extends Model
         return $noticias;
 
     }
+
+    public function obtenerMascotasConDueños()
+    {
+        return $this->db->table('mascotas')
+            ->select('mascotas.*, GROUP_CONCAT(amos.nombre SEPARATOR ", ") AS amos')
+            ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'left')
+            ->join('amos', 'amo_mascota.amo_id = amos.id', 'left')
+            ->groupBy('mascotas.nro_registro');
+    }
+
+    public function obtenerListaMascotas()
+    {
+        return $this->db->table('mascotas')
+            ->select('nro_registro, nombre, especie, raza, edad')
+            ->where('estado !=', 2) // Filtra las mascotas activas
+            ->get()
+            ->getResultArray();
+    }
+
+
+
 }
 
 

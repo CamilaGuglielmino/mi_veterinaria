@@ -11,8 +11,6 @@ $routes->get('/inicio', 'Vistas::index');
 $routes->get('/altas', 'Vistas::vistaAlta');
 $routes->get('/altasVeterinario', 'Veterinarios::vista');
 
-$routes->get('/modificaciones', 'Vistas::vistaModificar');
-
 /**MOSTRAR*/
 $routes->get('/mostrar', 'Vinculos::mostrarA');
 $routes->get('amosMostrar', 'Amos::obtenerAmos');
@@ -21,9 +19,11 @@ $routes->get('veterinariosMostrar', 'Veterinarios::obtenerVeterinarios');
 
 /** BAJAS*/
 
-
-$routes->get('/bajas', 'Vistas::cargarBajaMascotas');
-$routes->post('/bajaMascota', 'Mascotas::bajaMascota');
+$routes->get('/bajas', 'Mascotas::cargarBajaMascotas');
+$routes->get('/bajasMascotas', 'Mascotas::cargarBajaMascotas');
+$routes->get('/bajasVeterinarios', 'Veterinarios::cargarBajaVeterinarios');
+$routes->post('bajaVeterinario', 'Veterinarios::bajaVeterinarios');
+$routes->post('bajaMascota', 'Mascotas::bajaMascota');
 
 
 
@@ -33,15 +33,28 @@ $routes->get('/mascotas', 'Mascotas::alta');
 
 
 /**FORMULARIOS */
-$routes->post('Mascotas/alta', 'Mascotas::alta');
-$routes->post('Veterinarios/alta', 'Veterinarios::alta');
+$routes->post('alta', 'Mascotas::alta');
+$routes->post('formularioAlta', 'Veterinarios::alta');
 $routes->post('Amos/alta', 'Amos::alta');
-$routes->post('VinculoAmoMascota/alta', 'VinculoAmoMascota::alta');
-$routes->post('VinculoVeterinariaMascota/alta', 'VinculoVeterinariaMascota::alta');
+$routes->post('altaVinculo', 'Vinculos::alta');
 
 
 /**busqueda */
 $routes->get('veterinariosBusqueda', 'Vinculos::mostrarV');
 $routes->get('amosBusqueda', 'Vinculos::mostrarA');
 $routes->get('mascotasBusqueda', 'Vinculos::mostrarM');
+
+/**MOFICACIONES*/
+$routes->get('/modificaciones', 'Vistas::vistaModificar');
+$routes->get('/modificarAmo', 'Vistas::vistaModificar');
+$routes->get('/modificarMascota', 'Mascotas::vistaModificar');
+$routes->get('/modificarVeterinario', 'Veterinarios::vistaModificar');
+$routes->post('procesarModificacionA', 'Amos::modificar');
+$routes->post('procesarModificacionM', 'Mascotas::modificar');
+$routes->post('procesarModificacionV', 'Veterinarios::modificar');
+
+
+
+
+
 

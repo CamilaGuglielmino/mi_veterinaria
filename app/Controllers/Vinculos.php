@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Models\AmosModel;
 use App\Models\MascotasModel;
 use App\Models\VeterinariosModel;
+use App\Models\VinculosModel;
+use CodeIgniter\I18n\Time;
 
 
 class Vinculos extends BaseController
@@ -13,71 +15,109 @@ class Vinculos extends BaseController
     {
         $mascotaModel = new MascotasModel();
         $mascotaId = $this->request->getGet('mascota'); // Capturamos la selección
-        $listaMascotas = $mascotaModel->select('nro_registro, nombre')->get()->getResultArray();
+        $listaMascotas = $mascotaModel->obtenerListaMascotas();
 
-        $query = $mascotaModel->select('mascotas.*, GROUP_CONCAT(amos.nombre SEPARATOR ", ") AS amos')
-            ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'left') // Relación mascota-amo
-            ->join('amos', 'amo_mascota.amo_id = amos.id', 'left') // Relación amo
-            ->groupBy('mascotas.nro_registro');
-        // Filtramos si hay una selección válida
+        // Inicializar la consulta
+        $query = $mascotaModel->obtenerMascotasConDueños();
+
+        // Filtrar por ID solo si hay una selección válida
         if (!empty($mascotaId) && $mascotaId !== "todos") {
             $query->where('mascotas.nro_registro', $mascotaId);
         }
 
-        // Si no se seleccionó nada, la tabla debe ocultarse
-        $mascotas = (!empty($mascotaId)) ? $query->get()->getResultArray() : [];
+        // Obtener los resultados
+        $mascotas = $query->get()->getResultArray();
 
-        return view('header') .
-            view('mostrar/listadoMascotas', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas]) .
-            view('footer');
-
+        return view('header')
+            . view('mostrar/listadoMascotas', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas])
+            . view('footer');
     }
     public function mostrarA()
     {
         $amoModel = new AmosModel();
-        $amoId = $this->request->getGet('amo'); // Capturamos la selección
-        $listaAmos = $amoModel->select('id, nombre, apellido')->get()->getResultArray();
+        $amoId = $this->request->getGet('amo');
+        $listaAmos = $amoModel->obtenerListaAmos();
 
-        $query = $amoModel->select('amos.*, GROUP_CONCAT(mascotas.nombre SEPARATOR ", ") AS mascotas')
-            ->join('amo_mascota', 'amos.id = amo_mascota.amo_id', 'left') // Cambio aquí
-            ->join('mascotas', 'amo_mascota.mascota_id = mascotas.nro_registro', 'left') // Cambio aquí
-            ->groupBy('amos.id');
-        // Filtramos si hay una selección válida
+        // Inicializar la consulta
+        $query = $amoModel->obtenerAmo();
+
+        // Filtrar solo si hay una selección válida
         if (!empty($amoId) && $amoId !== "todos") {
             $query->where('amos.id', $amoId);
         }
 
-        // Si no se seleccionó nada, la tabla debe ocultarse
-        $amos = (!empty($amoId)) ? $query->get()->getResultArray() : [];
+        // Obtener los resultados
+        $amos = $query->get()->getResultArray();
 
-        return view('header') .
-            view('mostrar/listadoAmos', ['amos' => $amos, 'listaAmos' => $listaAmos]) .
-            view('footer');
+        return view('header')
+            . view('mostrar/listadoAmos', ['amos' => $amos, 'listaAmos' => $listaAmos])
+            . view('footer');
     }
+
 
     public function mostrarV()
     {
         $veterinarioModel = new VeterinariosModel();
         $veterinarioId = $this->request->getGet('veterinario'); // Capturamos la selección
-        $listaVeterinarios = $veterinarioModel->select('id, nombre, apellido')->get()->getResultArray();
+        $listaVeterinarios = $veterinarioModel->obtenerLista();
 
+        // Inicializar la consulta
+        $query = $veterinarioModel->obtener();
 
-        // Construimos la consulta base
-        $query = $veterinarioModel->select('veterinarios.*, GROUP_CONCAT(mascotas.nombre SEPARATOR ", ") AS mascotas_atendidas')
-            ->join('vinculo', 'veterinarios.id = vinculo.veterinario_id', 'left')
-            ->join('mascotas', 'vinculo.mascota_id = mascotas.nro_registro', 'left')
-            ->groupBy('veterinarios.id');
-
-        // Filtramos si hay una selección válida
-        if (!empty($veterinarioId) && $veterinarioId !== "todos") {
+        // Filtrar solo si hay una selección válida
+        if (!empty($veterinarioId)) {
             $query->where('veterinarios.id', $veterinarioId);
         }
 
-        // Si no se seleccionó nada, la tabla debe ocultarse
-        $veterinarios = (!empty($veterinarioId)) ? $query->get()->getResultArray() : [];
+        // Obtener los resultados
+        $veterinarios = $query->get()->getResultArray();
+
+        return view('header')
+            . view('mostrar/listadoVeterinarios', ['veterinarios' => $veterinarios, 'listaVeterinarios' => $listaVeterinarios])
+            . view('footer');
+    }
+    public function alta()
+    {
+        $vinculoModel = new VinculosModel();
+        $Amo = new AmosModel();
+        $Mascotas = new MascotasModel();
+
+        $datoAmo = $Amo->obtenerAmos();
+        $datoMascota = $Mascotas->mostrar_mascotas();
+
+        $mascotaId = $this->request->getPost('id_mascota');
+        $amoId = $this->request->getPost('id_amo');
+        $fechaRegistro = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss'); // Guarda la fecha actual
+
+        if (!empty($mascotaId) && !empty($amoId)) {
+            // Verificar si ya existe el vínculo
+            $existeVinculo = $vinculoModel->where('mascota_id', $mascotaId)
+                ->where('amo_id', $amoId)
+                ->first();
+
+            if ($existeVinculo) {
+                $mensaje = "Error: Este vínculo ya existe.";
+            } else {
+                // Crear nuevo vínculo si no existe
+                $data = [
+                    'id_vinculo' => mt_rand(1, 100000),
+                    'amo_id' => $amoId,
+                    'mascota_id' => $mascotaId,
+                    'fecha_inicio' => $fechaRegistro,
+                    'estado' => 1,
+                ];
+
+                $resultado = $vinculoModel->insertar($data);
+
+                // Verificar si la inserción fue exitosa
+                $mensaje = $resultado ? "Vínculo registrado correctamente." : "Error: No se pudo registrar el vínculo.";
+            }
+        } else {
+            $mensaje = "Error: Debe seleccionar un amo y una mascota.";
+        }
 
         return view('header') .
-            view('mostrar/listadoVeterinarios', ['veterinarios' => $veterinarios, 'listaVeterinarios' => $listaVeterinarios]) .
+            view('altas/altas', ['mensaje' => $mensaje, 'datoMascota' => $datoMascota, 'datoAmo' => $datoAmo]) .
             view('footer');
     }
 

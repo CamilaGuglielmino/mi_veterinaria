@@ -26,12 +26,7 @@ class Amos extends BaseController
 
         }
     }
-    public function baja()
-    { /* Código para eliminar relaciones */
-    }
-    public function modificar()
-    { /* Código para actualizar registros */
-    }
+
     public function mostrar()
     {
         $amoModel = new AmosModel();
@@ -54,10 +49,50 @@ class Amos extends BaseController
         // Definir la variable
         $amos = [];
         // Obtener la lista de veterinarios para el select
-        $listaAmos = $amoModel->select('id, nombre, apellido')->get()->getResultArray();
+        $listaAmos = $amoModel->obtenerListaAmos();
 
         return view('header') .
             view('/mostrar/listadoAmos', ['listaAmos' => $listaAmos, 'amos' => $amos]) .
+            view('footer');
+    }
+    public function modificar()
+    {
+        $amoModel = new AmosModel();
+        $listaAmos = $amoModel->obtenerListaAmos();
+
+        $amoId = $this->request->getPost('amo_id');
+        $nombre = $this->request->getPost('nombre');
+        $apellido = $this->request->getPost('apellido');
+        $telefono = $this->request->getPost('telefono');
+        $direccion = $this->request->getPost('direccion');
+        $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
+
+
+        if (!empty($amoId)) {
+            // Actualizar datos del amo
+            $resultado = $amoModel->set([
+                'nombre' => $nombre,
+                'apellido' => $apellido,
+                'telefono' => $telefono,
+                'direccion' => $direccion,
+                'fecha_modifica' => $fecha
+
+            ])
+                ->where('id', $amoId)
+                ->update();
+
+            // Verificar si se actualizó correctamente
+            if ($resultado) {
+                $mensaje = "Datos del amo actualizados correctamente.";
+            } else {
+                $mensaje = "Error: No se pudo modificar la información.";
+            }
+        } else {
+            $mensaje = "Error: No se recibió un ID válido.";
+        }
+
+        return view('header') .
+            view('modificaciones/modificarAmo', ['mensaje' => $mensaje, 'listaAmos' => $listaAmos]) .
             view('footer');
     }
 }

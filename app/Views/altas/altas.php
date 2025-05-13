@@ -1,6 +1,9 @@
+
 <?php $session = session(); ?>
 <?php $validation = session('validation'); ?>
-
+<?php if (isset($mensaje)): ?>
+    <p class="success-message"><?= esc($mensaje) ?></p>
+<?php endif; ?>
 <body>
     <main>
         <nav class="nav">
@@ -12,7 +15,7 @@
 
         <div class="tab-content">
             <div id="vinculos" class="tab-pane active">
-                <form action="<?php echo base_url('VinculoMascotaAmo/alta') ?>" method="POST">
+                <form action="<?php echo base_url('altaVinculo') ?>" method="POST">
                     <p class="titulos">Mascotas y Amos</p>
 
                     <!-- Selección de mascota -->
@@ -20,7 +23,7 @@
                         <label for="id_mascota" class="form-label">Nombre de la Mascota</label>
                         <select class="form-control" id="id_mascota" name="id_mascota" required>
                             <option value="">Selecciona una opción</option>
-                            <?php foreach ($datoMascota['dato'] as $mascota): ?>
+                            <?php foreach ($datoMascota as $mascota): ?>
                                 <option value="<?= htmlspecialchars($mascota['nro_registro']) ?>">
                                     <?= htmlspecialchars($mascota['nombre']) ?>
                                 </option>
@@ -38,7 +41,7 @@
                         <label for="id_amo" class="form-label">Nombre del Amo</label>
                         <select class="form-control" id="id_amo" name="id_amo" required>
                             <option value="">Selecciona una opción</option>
-                            <?php foreach ($datoAmo['dato'] as $amo): ?>
+                            <?php foreach ($datoAmo as $amo): ?>
                                 <option value="<?= htmlspecialchars($amo['id']) ?>">
                                     <?= htmlspecialchars($amo['nombre']) ?>
                                 </option>
@@ -46,7 +49,7 @@
                         </select>
                         <h6>Si la Propietario no está registrado, <button type="button"
                                 onclick="mostrarModal('amoModal')">
-                                Registrar Mascota
+                                Registrar Propietarios
                             </button></h6>
                     </div>
 
@@ -61,7 +64,7 @@
         <div class="modal-contenido">
             <span onclick="cerrarModal('mascotaModal')" class="cerrar">&times;</span>
             <h2>Registrar Mascota</h2>
-            <form action="<?php echo base_url('Mascotas/alta') ?>" method="POST">
+            <form action="<?php echo base_url('alta') ?>" method="POST">
                 <label for="nombre">Nombre:</label>
                 <input type="text" name="nombre" required>
 
@@ -87,19 +90,24 @@
     <div id="amoModal" class="modal">
         <div class="modal-contenido">
             <span onclick="cerrarModal('amoModal')" class="cerrar">&times;</span>
-            <h2>Registrar Mascota</h2>
+            <h2>Registrar Propietario</h2>
             <form action="<?php echo base_url('Amos/alta') ?>" method="POST">
-                <label for="raza" class="form-label">Nombre:</label>
+                <label for="nombre" class="form-label">Nombre:</label>
                 <input type="text" name="nombre" placeholder="Nombre" required>
                 <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
                     <span class="help-block"><?= esc($validation->getError('nombre')) ?></span>
                 <?php endif; ?>
-                <label for="raza" class="form-label">Apellido:</label>
+                <label for="apellido" class="form-label">Apellido:</label>
                 <input type="text" name="apellido" placeholder="Apellido" required>
                 <?php if (!empty($validation) && $validation->hasError('apellido')): ?>
                     <span class="help-block"><?= esc($validation->getError('apellido')) ?></span>
                 <?php endif; ?>
-                <label for="raza" class="form-label">Telefono:</label>
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" name="direccion" placeholder="Teléfono">
+                <?php if (!empty($validation) && $validation->hasError('direccion')): ?>
+                    <span class="help-block"><?= esc($validation->getError('direccion')) ?></span>
+                <?php endif; ?>
+                <label for="telefono" class="form-label">Telefono:</label>
                 <input type="text" name="telefono" placeholder="Teléfono">
                 <?php if (!empty($validation) && $validation->hasError('telefono')): ?>
                     <span class="help-block"><?= esc($validation->getError('telefono')) ?></span>
