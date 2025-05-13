@@ -57,7 +57,7 @@
                 </a>
             </li>
             <li>
-                <a href="<?php echo base_url('mostrar') ?>">
+                <a href="<?php echo base_url('amosMostrar') ?>">
 
                     <img src="icons/icons/search.svg" alt="">
                     <span>Mostrar</span>

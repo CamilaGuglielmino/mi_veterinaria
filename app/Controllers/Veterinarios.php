@@ -18,13 +18,15 @@ class Veterinarios extends BaseController
     {
         $Veterinario = new VeterinariosModel();
 
+        // Obtener el servicio de validación de CodeIgniter
+        $validation = \Config\Services::validation();
+
         // Verificar validación antes de insertar
         if (!$this->validate($Veterinario->validationRules, $Veterinario->validationMessages)) {
-            return view('header')
-                . view('altas/altasVeterinario', [
-                    'validation' => $this->validator
-                ])
-                . view('footer');
+            return view('altas/altasVeterinario', [
+                'validation' => $validation,
+                'mensaje' => 'Error: Verifique los datos ingresados.'
+            ]);
         }
 
         // Formatear fecha actual
@@ -40,13 +42,19 @@ class Veterinarios extends BaseController
             'estado' => 1,
         ];
 
-        // Insertar en la base de datos
-        $Veterinario->insert($data);
+        // Insertar en la base de datos y verificar si fue exitoso
+        $resultado = $Veterinario->insert($data);
 
-        // Redirigir a la página principal
-        return redirect()->to(base_url('/'));
+        // Guardar el mensaje en sesión
+        $mensaje = $resultado ? "Veterinario registrado exitosamente." : "Error: No se pudo registrar el veterinario.";
+        session()->setFlashdata('mensaje', $mensaje);
+
+        // Retornar la vista con validación y mensaje
+        return view('altas/altasVeterinario', [
+            'validation' => $validation,
+            'mensaje' => session()->getFlashdata('mensaje')
+        ]);
     }
-
 
     public function obtenerVeterinarios()
     {
@@ -72,8 +80,6 @@ class Veterinarios extends BaseController
             view('bajas/bajaVeterinario', ['veterinario' => $veterinario, 'listaVeterinarios' => $listaVeterinarios]) .
             view('footer');
     }
-
-
     public function bajaVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();

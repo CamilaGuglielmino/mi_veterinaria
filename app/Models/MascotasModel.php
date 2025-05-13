@@ -82,6 +82,7 @@ class MascotasModel extends Model
         $this->db->table('mascotas')->insertBatch($data);
 
     }
+    
     public function mostrar_mascotas()
     {
         $Mascotas = $this->db->table('mascotas');

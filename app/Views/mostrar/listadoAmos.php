@@ -8,7 +8,8 @@
             </ul>
         </nav>
 
-
+<br>
+<br>
         <h1>Lista de Amos</h1>
         <form method="GET" action="<?= base_url('amosBusqueda') ?>">
             <label for="amo">Seleccionar amo:</label>

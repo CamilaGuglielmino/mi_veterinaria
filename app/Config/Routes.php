@@ -10,6 +10,10 @@ $routes->get('/', 'Vistas::index');
 $routes->get('/inicio', 'Vistas::index');
 $routes->get('/altas', 'Vistas::vistaAlta');
 $routes->get('/altasVeterinario', 'Veterinarios::vista');
+$routes->get('altasVeterinario', 'Veterinarios::vista');
+
+
+
 
 /**MOSTRAR*/
 $routes->get('/mostrar', 'Vinculos::mostrarA');

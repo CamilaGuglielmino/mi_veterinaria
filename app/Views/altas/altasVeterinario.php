@@ -1,29 +1,48 @@
-
-<?php $validation = isset($validation) ? $validation : \Config\Services::validation(); ?>
-<?php if (isset($mensaje)): ?>
-    <p class="success-message"><?= esc($mensaje) ?></p>
-<?php endif; ?>
 <body>
+    <?php $validation = isset($validation) ? $validation : \Config\Services::validation(); ?>
+
+    <?php if ($validation->getErrors()): ?>
+        <div class="error-message">
+            <?php foreach ($validation->getErrors() as $error): ?>
+                <p><?= esc($error) ?></p>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <main>
         <nav class="nav">
             <ul class="nav-n">
-                <li class="lista-interna"><a href="<?php echo base_url('altas') ?>">Mascotas y Amos</a></li>
-                <li class="lista-interna"><a href="<?php echo base_url('altasVeterinario') ?>">Veterinarios</a></li>
+                <li class="lista-interna"><a href="<?= base_url('altas') ?>">Mascotas y Amos</a></li>
+                <li class="lista-interna"><a href="<?= base_url('altasVeterinario') ?>">Veterinarios</a></li>
             </ul>
         </nav>
+
+        <!-- Mostrar mensaje de éxito -->
+        <?php if (session()->getFlashdata('mensaje')): ?>
+            <p class="success-message"><?= esc(session()->getFlashdata('mensaje')) ?></p>
+        <?php endif; ?>
+
         <div class="tab-content">
             <div id="veterinarios" class="tab-pane active">
-                <form action="<?php echo base_url('formularioAlta') ?>" method="POST">
+                <form action="<?= base_url('formularioAlta') ?>" method="POST">
                     <p class="titulos">Médicos Veterinarios</p>
-                    <div class="mb-3"><label for="nombre" class="form-label">Nombre:</label><input type="text"
-                            class="form-control" id="nombre" name="nombre" value="<?= old('nombre') ?>"
-                            required><?php if (isset($validation)): ?><span
-                                class="help-block"><?= esc($validation->getError('nombre')) ?></span><?php endif; ?></div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre"
+                            value="<?= set_value('nombre') ?>" required>
+                        <?php if ($validation->hasError('nombre')): ?>
+                            <span class="help-block"><?= esc($validation->getError('nombre')) ?></span>
+                        <?php endif; ?>
+                    </div>
 
                     <div class="mb-3">
                         <label for="apellido" class="form-label">Apellido:</label>
                         <input type="text" class="form-control" id="apellido" name="apellido"
                             value="<?= set_value('apellido') ?>" required>
+                        <?php if ($validation->hasError('apellido')): ?>
+                            <span class="help-block"><?= esc($validation->getError('apellido')) ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <div class="mb-3">
@@ -43,7 +62,7 @@
                     <div class="mb-3">
                         <label for="telefono" class="form-label">Teléfono:</label>
                         <input type="text" class="form-control" id="telefono" name="telefono" required>
-                        <?php if (isset($validation)): ?>
+                        <?php if ($validation->hasError('telefono')): ?>
                             <span class="help-block"><?= esc($validation->getError('telefono')) ?></span>
                         <?php endif; ?>
                     </div>
@@ -53,3 +72,4 @@
             </div>
         </div>
     </main>
+</body>
