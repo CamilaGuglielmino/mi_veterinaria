@@ -27,7 +27,7 @@ $routes->get('/bajas', 'Mascotas::cargarBajaMascotas');
 $routes->get('/bajasMascotas', 'Mascotas::cargarBajaMascotas');
 $routes->get('/bajasVeterinarios', 'Veterinarios::cargarBajaVeterinarios');
 $routes->post('bajaVeterinario', 'Veterinarios::bajaVeterinarios');
-$routes->post('bajaMascota', 'Mascotas::bajaMascota');
+$routes->post('bajaMascota', 'Vinculos::bajaMascota');
 
 
 

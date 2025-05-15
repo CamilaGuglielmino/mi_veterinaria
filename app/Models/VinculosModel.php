@@ -5,11 +5,11 @@ class VinculosModel extends Model
 {
     protected $table = 'amo_mascota';
     protected $primaryKey = 'id_vinculo';
-    protected $useAutoIncrement = true;
+    protected $useAutoIncrement = false;
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
 
-    protected $allowedFields = ['amo_id', 'mascotas_id', 'fecha_inicio', 'fecha_fin', 'motivo', 'estado'];
+    protected $allowedFields = ['amo_id', 'mascotas_id', 'fecha_inicio', 'fecha_defuncion','fecha_fin', 'motivo', 'estado'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

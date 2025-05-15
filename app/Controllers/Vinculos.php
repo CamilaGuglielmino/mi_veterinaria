@@ -15,10 +15,10 @@ class Vinculos extends BaseController
     {
         $mascotaModel = new MascotasModel();
         $mascotaId = $this->request->getGet('mascota'); // Capturamos la selección
-        $listaMascotas = $mascotaModel->obtenerListaMascotas();
+        $listaMascotas = $mascotaModel->obtenerListaMascotasTodo();
 
         // Inicializar la consulta
-        $query = $mascotaModel->obtenerMascotasConDueños();
+        $query = $mascotaModel->obtenerMascotasConDueñosMotvio();
 
         // Filtrar por ID solo si hay una selección válida
         if (!empty($mascotaId) && $mascotaId !== "todos") {
@@ -32,6 +32,7 @@ class Vinculos extends BaseController
             . view('mostrar/listadoMascotas', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas])
             . view('footer');
     }
+
     public function mostrarA()
     {
         $amoModel = new AmosModel();
@@ -59,7 +60,7 @@ class Vinculos extends BaseController
     {
         $veterinarioModel = new VeterinariosModel();
         $veterinarioId = $this->request->getGet('veterinario'); // Capturamos la selección
-        $listaVeterinarios = $veterinarioModel->obtenerLista();
+        $listaVeterinarios = $veterinarioModel->obtenerListaTodo();
 
         // Inicializar la consulta
         $query = $veterinarioModel->obtener();
@@ -87,39 +88,100 @@ class Vinculos extends BaseController
 
         $mascotaId = $this->request->getPost('id_mascota');
         $amoId = $this->request->getPost('id_amo');
-        $fechaRegistro = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss'); // Guarda la fecha actual
+        $fechaRegistro = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss');
 
-        if (!empty($mascotaId) && !empty($amoId)) {
-            // Verificar si ya existe el vínculo
-            $existeVinculo = $vinculoModel->where('mascota_id', $mascotaId)
-                ->where('amo_id', $amoId)
-                ->first();
-
-            if ($existeVinculo) {
-                $mensaje = "Error: Este vínculo ya existe.";
-            } else {
-                // Crear nuevo vínculo si no existe
-                $data = [
-                    'id_vinculo' => mt_rand(1, 100000),
-                    'amo_id' => $amoId,
-                    'mascota_id' => $mascotaId,
-                    'fecha_inicio' => $fechaRegistro,
-                    'estado' => 1,
-                ];
-
-                $resultado = $vinculoModel->insertar($data);
-
-                // Verificar si la inserción fue exitosa
-                $mensaje = $resultado ? "Vínculo registrado correctamente." : "Error: No se pudo registrar el vínculo.";
-            }
-        } else {
-            $mensaje = "Error: Debe seleccionar un amo y una mascota.";
+        // Validación de IDs
+        if (!$Amo->find($amoId) || !$Mascotas->find($mascotaId)) {
+            session()->setFlashdata('error_message', 'Error: Amo o mascota inválidos.');
+            return redirect()->to(base_url('/altas'));
         }
 
-        return view('header') .
-            view('altas/altas', ['mensaje' => $mensaje, 'datoMascota' => $datoMascota, 'datoAmo' => $datoAmo]) .
-            view('footer');
+        // Verificar si ya existe el vínculo
+        $existeVinculo = $vinculoModel->where('mascota_id', $mascotaId)
+            ->where('amo_id', $amoId)
+            ->first();
+
+        if ($existeVinculo) {
+            session()->setFlashdata('mensaje', 'Error: Este vínculo ya existe.');
+        } else {
+            // Crear nuevo vínculo
+            $data = [
+                'id_vinculo' => mt_rand(100, 1000),
+                'amo_id' => $amoId,
+                'mascota_id' => $mascotaId,
+                'fecha_inicio' => $fechaRegistro,
+                'estado' => 1,
+            ];
+
+            if ($vinculoModel->insertar($data)) {
+                session()->setFlashdata('mensaje', 'Vínculo registrado correctamente.');
+            } else {
+                session()->setFlashdata('mensaje', 'Error: No se pudo registrar el vínculo.');
+            }
+        }
+
+        session()->set([
+            'datoMascota' => $datoMascota,
+            'datoAmo' => $datoAmo
+        ]);
+
+        return redirect()->to(base_url('/altas'));
     }
+
+
+public function bajaMascota()
+{
+    $relacion = new VinculosModel();
+    $mascota = new MascotasModel();
+
+    // Obtener datos correctamente
+    $mascotaId = $this->request->getPost('mascota_id');
+    $vinculoId = $this->request->getPost('vinculo_id'); 
+    $motivo = $this->request->getPost('motivo');
+    $fechaBaja = $this->request->getPost('fecha_baja'); 
+
+    // Validar existencia en la base de datos
+    $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
+    $vinculoExiste = $relacion->where('id_vinculo', $vinculoId)->first();
+
+    if (!$mascotaExiste) {
+        session()->setFlashdata('mensaje', "Error: La mascota seleccionada no existe.");
+        return redirect()->to('/bajas');
+    }
+
+    if (!$vinculoExiste) {
+        session()->setFlashdata('mensaje', "Error: El vínculo seleccionado no existe.");
+        return redirect()->to('/bajas');
+    }
+
+    // Preparar datos para actualización
+    $data = ($motivo === 'fallecimiento') ? 
+        ['fecha_defuncion' => $fechaBaja, 'estado' => 2] : 
+        ['fecha_fin' => $fechaBaja, 'estado' => 2];
+
+    $dato = ($motivo === 'fallecimiento') ? 
+        ['fecha_defuncion' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2] : 
+        ['fecha_fin' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2];
+
+    // Ejecutar actualización con `set()`
+    $mascota->set($data)->where('nro_registro', $mascotaId)->update();
+    $relacion->set($dato)->where('id_vinculo', $vinculoId)->update();
+
+    // Validar filas afectadas
+    $mascotaAfectada = $mascota->affectedRows();
+    $relacionAfectada = $relacion->affectedRows();
+
+
+    if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
+        session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
+    } else {
+        session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
+    }
+
+
+    return redirect()->to(base_url('/bajas'));
+}
+
 
 
 

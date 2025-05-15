@@ -28,22 +28,51 @@ class Mascotas extends BaseController
 
         // Generar un número único de registro
         $dateString = date('mdy'); //Generate a datestring.  
-        $numeroAleatorio = mt_rand(1, 100); 
+        $numeroAleatorio = mt_rand(1, 100);
         $nro_registro = $numeroAleatorio . $dateString;
 
+        $reglas = [
+            'nombre' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo nombre es obligatorio.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'raza' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo raza es obligatorio.',
+                    'min_length' => 'La raza debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'edad' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'El campo edad es obligatorio.'
+                ]
+            ],
+        ];
+
+        if (!$this->validate($reglas)) {
+            return redirect()->to(base_url('altas')) // Esta es tu vista con el modal incluido
+                ->withInput()
+                ->with('validation', $this->validator)
+                ->with('abrir_modal', 'mascotaModal');
+        }
 
         $data = [
             'nro_registro' => $nro_registro,
-            'nombre' => $this->request->getPost('nombre'),
+            'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
             'especie' => $this->request->getPost('especie'),
-            'raza' => $this->request->getPost('raza'),
+            'raza' => ucfirst(trim($this->request->getPost('raza'))),
             'edad' => $this->request->getPost('edad'),
             'fecha_alta' => $fecha,
             'estado' => 1,
         ];
 
         $resultado = $Mascotas->insertar($data);
-        
+
 
         if ($resultado) {
             $mensaje = "Mascota registrada exitosamente.";
@@ -52,53 +81,53 @@ class Mascotas extends BaseController
         }
 
         return view('header') .
-            view('altas/altas',['datoMascota' => $datoMascota, 'datoAmo'=>$datoAmo, 'mensaje'=>$mensaje]) .
+            view('altas/altas', ['datoMascota' => $datoMascota, 'datoAmo' => $datoAmo, 'mensaje' => $mensaje]) .
             view('footer');
     }
     public function bajaMascota()
     {
-        $relacionModel = new VinculosModel();
-        $mascotaModel = new MascotasModel();
-        $listaMascotas = $mascotaModel->obtenerListaMascotas();
+        $relacion = new VinculosModel();
+        $mascota = new MascotasModel();
 
+        // Obtener datos
         $mascotaId = $this->request->getPost('mascota_id');
         $motivo = $this->request->getPost('motivo');
-        $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
+        $fecha = Time::now()->toDateString();
 
-        if (!empty($mascotaId)) {
-            if ($motivo === 'fallecimiento') {
-                // Actualizar fecha de defunción y estado a 2
-                $resultadoMascota = $mascotaModel->set([
-                    'fecha_defuncion' => $fecha,
-                    'estado' => 2
-                ])
-                    ->where('nro_registro', $mascotaId)
-                    ->update();
-            } elseif ($motivo === 'venta') {
-                // Registrar la baja de la relación y actualizar estado de la mascota
-                $resultadoRelacion = $relacionModel->set(['fecha_fin' => $fecha])
-                    ->where('mascota_id', $mascotaId)
-                    ->update();
+        // Validar existencia en la base de datos
+        $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
+        $relacionExiste = $relacion->where('mascota_id', $mascotaId)->first();
 
-                $resultadoEstado = $mascotaModel->set(['estado' => 2])
-                    ->where('nro_registro', $mascotaId)
-                    ->update();
-            }
-
-            if (($motivo === 'fallecimiento' && $resultadoMascota) || ($motivo === 'venta' && $resultadoRelacion && $resultadoEstado)) {
-                $mensaje = "Baja de la mascota registrada exitosamente.";
-            } else {
-                $mensaje = "Error: No se pudo actualizar la base de datos.";
-            }
-        } else {
-            $mensaje = "Error: No se recibió un ID válido.";
+        if (!$mascotaExiste || !$relacionExiste) {
+            session()->setFlashdata('mensaje', "Error: La mascota o su vínculo no existen en la base de datos.");
+            return redirect()->to('/bajas');
         }
 
-        return view('header') .
-            view('bajas/bajaVinculos', ['mensaje' => $mensaje, 'listaMascotas' => $listaMascotas]) .
-            view('footer');
-    }
+        // Preparar datos para actualización
+        $data = ($motivo === 'fallecimiento') ?
+            ['fecha_defuncion' => $fecha, 'estado' => 2] :
+            ['fecha_fin' => $fecha, 'estado' => 2];
 
+        $dato = ($motivo === 'fallecimiento') ?
+            ['fecha_defuncion' => $fecha, 'motivo' => $motivo, 'estado' => 2] :
+            ['fecha_fin' => $fecha, 'motivo' => $motivo, 'estado' => 2];
+
+        // Ejecutar actualización con `set()` para evitar problemas con NULL
+        $mascota->set($data)->where('nro_registro', $mascotaId)->update();
+        $relacion->set($dato)->where('mascota_id', $mascotaId)->update();
+
+        // Validar filas afectadas
+        $mascotaAfectada = $mascota->affectedRows();
+        $relacionAfectada = $relacion->affectedRows();
+
+        if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
+            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
+        } else {
+            session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
+        }
+
+        return redirect()->to('/bajas');
+    }
     public function mostrar()
     {
         $Amo = new AmosModel();
@@ -111,11 +140,11 @@ class Mascotas extends BaseController
     public function cargarBajaMascotas()
     {
         $mascotaModel = new MascotasModel();
-        $listaMascotas = $mascotaModel->obtenerListaMascotas();
-        $mascotas = $mascotaModel->obtenerMascotasConDueños();
+        $listaMascotas = $mascotaModel->obtenerListaMascotasConDueños();
+      
 
         return view('header') .
-            view('bajas/bajaVinculos', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas]) .
+            view('bajas/bajaVinculos', ['listaMascotas' => $listaMascotas]) .
             view('footer');
     }
     public function obtenerMascotas()
@@ -172,8 +201,9 @@ class Mascotas extends BaseController
             $mensaje = "Error: No se recibió un ID válido.";
         }
 
-        return view('header') .
-            view('modificaciones/modificarMascota', ['mensaje' => $mensaje, 'listaMascostas' => $listaMascostas]) .
-            view('footer');
+        session()->setFlashdata('mensaje', $mensaje);
+        session()->setFlashdata('listaMascostas', $listaMascostas);
+
+        return redirect()->to(base_url('/modificarMascota'));
     }
 }

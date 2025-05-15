@@ -8,25 +8,62 @@ use CodeIgniter\I18n\Time;
 class Amos extends BaseController
 {
     public function alta()
-    { {
-            $fechaActual = Time::now()->format('d/m/Y H:i:s');
+    {
+        $fechaActual = Time::now()->format('d/m/Y H:i:s');
 
-            $data = [
-                'id' => rand(100, 999), // 
-                'nombre' => $this->request->getPost('nombre'),
-                'apellido' => $this->request->getPost('apellido'),
-                'direccion' => $this->request->getPost('direccion'),
-                'telefono' => $this->request->getPost('telefono'),
-                'fecha_alta' => $fechaActual,
-            ];
-            $Amo = new AmosModel();
-            $Amo->insertar($data);
+        $reglas = [
+            'nombre' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo nombre es obligatorio.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'apellido' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo apellido es obligatorio.',
+                    'min_length' => 'El apellido debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'direccion' => [
+                'rules' => 'required|min_length[4]',
+                'errors' => [
+                    'required' => 'El campo dirección es obligatorio.',
+                    'min_length' => 'La dirección debe tener al menos 4 caracteres.'
+                ]
+            ],
+            'telefono' => [
+                'rules' => 'required|min_length[10]',
+                'errors' => [
+                    'required' => 'El campo teléfono es obligatorio.',
+                    'min_length' => 'El teléfono debe tener al menos 10 caracteres.'
+                ]
+            ],
+        ];
 
-            return redirect()->to(base_url('/'));
-
+        if (!$this->validate($reglas)) {
+            return redirect()->to(base_url('altas')) // Esta es tu vista con el modal incluido
+                ->withInput()
+                ->with('validation', $this->validator)
+                ->with('abrir_modal', 'amoModal');
         }
-    }
 
+
+        $data = [
+            'id' => rand(100, 999),
+            'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
+            'apellido' => ucfirst(trim($this->request->getPost('apellido'))),
+            'direccion' => ucfirst(trim($this->request->getPost('direccion'))),
+            'telefono' => $this->request->getPost('telefono'),
+            'fecha_alta' => $fechaActual,
+        ];
+
+        $Amo = new AmosModel();
+        $Amo->insertar($data);
+
+        return redirect()->to(base_url('altas'))->with('mensaje', 'Amo registrado exitosamente.');
+    }
     public function mostrar()
     {
         $amoModel = new AmosModel();
@@ -90,9 +127,11 @@ class Amos extends BaseController
         } else {
             $mensaje = "Error: No se recibió un ID válido.";
         }
+        // Enviar datos con Flashdata antes de redirigir
+        session()->setFlashdata('mensaje', $mensaje);
+        session()->setFlashdata('listaAmos', $listaAmos);
 
-        return view('header') .
-            view('modificaciones/modificarAmo', ['mensaje' => $mensaje, 'listaAmos' => $listaAmos]) .
-            view('footer');
+        return redirect()->to(base_url('/modificarAmo'));
+
     }
 }

@@ -16,44 +16,57 @@ class Veterinarios extends BaseController
 
     public function alta()
     {
-        $Veterinario = new VeterinariosModel();
-
-        // Obtener el servicio de validación de CodeIgniter
-        $validation = \Config\Services::validation();
-
-        // Verificar validación antes de insertar
-        if (!$this->validate($Veterinario->validationRules, $Veterinario->validationMessages)) {
-            return view('altas/altasVeterinario', [
-                'validation' => $validation,
-                'mensaje' => 'Error: Verifique los datos ingresados.'
-            ]);
-        }
-
         // Formatear fecha actual
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
 
+        $reglas = [
+            'nombre' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo nombre es obligatorio.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'apellido' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo apellido es obligatorio.',
+                    'min_length' => 'El apellido debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'telefono' => [
+                'rules' => 'required|min_length[10]',
+                'errors' => [
+                    'required' => 'El campo teléfono es obligatorio.',
+                    'min_length' => 'El teléfono debe tener al menos 10 caracteres.'
+                ]
+            ],
+        ];
+
+        if (!$this->validate($reglas)) {
+            return redirect()->to(base_url('altasVeterinario'))
+                ->withInput()
+                ->with('validation', $this->validator);
+        }
+
         // Datos a insertar
         $data = [
-            'nombre' => $this->request->getPost('nombre'),
-            'apellido' => $this->request->getPost('apellido'),
+            'id' => mt_rand(1, 999),
+            'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
+            'apellido' => ucfirst(trim($this->request->getPost('apellido'))),
             'especialidad' => $this->request->getPost('especialidad'),
             'telefono' => $this->request->getPost('telefono'),
-            'fecha_ingreso' => $fecha,
+            'fecha_creacion' => $fecha,
             'estado' => 1,
         ];
 
         // Insertar en la base de datos y verificar si fue exitoso
-        $resultado = $Veterinario->insert($data);
-
-        // Guardar el mensaje en sesión
-        $mensaje = $resultado ? "Veterinario registrado exitosamente." : "Error: No se pudo registrar el veterinario.";
-        session()->setFlashdata('mensaje', $mensaje);
+        $Veterinario = new VeterinariosModel();
+        $Veterinario->insert($data);
 
         // Retornar la vista con validación y mensaje
-        return view('altas/altasVeterinario', [
-            'validation' => $validation,
-            'mensaje' => session()->getFlashdata('mensaje')
-        ]);
+        return redirect()->to(base_url('altasVeterinario'))->with('mensaje', 'Veterinario registrado exitosamente.');
+
     }
 
     public function obtenerVeterinarios()
@@ -70,6 +83,7 @@ class Veterinarios extends BaseController
             view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
             view('footer');
     }
+
     public function cargarBajaVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();
@@ -80,6 +94,7 @@ class Veterinarios extends BaseController
             view('bajas/bajaVeterinario', ['veterinario' => $veterinario, 'listaVeterinarios' => $listaVeterinarios]) .
             view('footer');
     }
+
     public function bajaVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();
@@ -108,9 +123,11 @@ class Veterinarios extends BaseController
             $mensaje = "Error: No se recibió un ID válido.";
         }
 
-        return view('header') .
-            view('bajas/bajaVeterinario', ['mensaje' => $mensaje, 'listaVeterinarios' => $listaVeterinarios]) .
-            view('footer');
+        session()->setFlashdata('listaVeterinarios', $listaVeterinarios);
+        session()->setFlashdata('mensaje', $mensaje);
+        return redirect()->to(base_url('/bajasVeterinarios'));
+
+
     }
     public function vistaModificar()
     {
@@ -158,8 +175,9 @@ class Veterinarios extends BaseController
             $mensaje = "Error: No se recibió un ID válido.";
         }
 
-        return view('header') .
-            view('modificaciones/modificarVeterinario', ['mensaje' => $mensaje, 'listaVeterinarios' => $listaVeterinarios]) .
-            view('footer');
+        session()->setFlashdata('mensaje', $mensaje);
+        session()->setFlashdata('listaVeterinarios', $listaVeterinarios);
+
+        return redirect()->to(base_url('/modificarVeterinario'));
     }
 }

@@ -1,27 +1,38 @@
-
 <?php $session = session(); ?>
 <?php $validation = session('validation'); ?>
-<?php if (isset($mensaje)): ?>
-    <p class="success-message"><?= esc($mensaje) ?></p>
+
+
+<?php if (session()->has('mensaje')): ?>
+    <?php $mensaje = session()->getFlashdata('mensaje'); ?>
+    <div class="alert <?= strpos($mensaje, 'Error') !== false ? 'alert-danger' : 'alert-success' ?> alert-dismissible fade show"
+        role="alert">
+        <?= $mensaje; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 <?php endif; ?>
+
 <body>
-    <main>
-        <nav class="nav">
-            <ul class="nav-n">
-                <li class="lista-interna"><a href="<?php echo base_url('altas') ?>">Mascotas y Amos</a></li>
-                <li class="lista-interna"><a href="<?php echo base_url('altasVeterinario') ?>">Veterinarios</a></li>
+    <main class="container mt-4">
+        <nav class="nav nav-tabs">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="<?php echo base_url('altas') ?>">Mascotas y Amos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="<?php echo base_url('altasVeterinario') ?>">Veterinarios</a>
+                </li>
             </ul>
         </nav>
 
-        <div class="tab-content">
+        <div class="tab-content mt-3">
             <div id="vinculos" class="tab-pane active">
-                <form action="<?php echo base_url('altaVinculo') ?>" method="POST">
-                    <p class="titulos">Mascotas y Amos</p>
+                <form action="<?php echo base_url('altaVinculo') ?>" method="POST" class="bg-light p-4 rounded shadow">
+                    <h2 class="text-center fw-bold mb-4">Mascotas y Amos</h2>
 
-                    <!-- Selección de mascota -->
+                    <!-- Selección de Mascota -->
                     <div class="mb-3">
                         <label for="id_mascota" class="form-label">Nombre de la Mascota</label>
-                        <select class="form-control" id="id_mascota" name="id_mascota" required>
+                        <select class="form-select" id="id_mascota" name="id_mascota" required>
                             <option value="">Selecciona una opción</option>
                             <?php foreach ($datoMascota as $mascota): ?>
                                 <option value="<?= htmlspecialchars($mascota['nro_registro']) ?>">
@@ -30,16 +41,21 @@
                             <?php endforeach; ?>
                         </select>
 
-                        <h6>Si la mascota no está registrada, <button type="button"
-                                onclick="mostrarModal('mascotaModal')">
+                        <small class="text-muted">
+                            Si la mascota no está registrada,
+
+                            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal"
+                                data-bs-target="#mascotaModal">
                                 Registrar Mascota
-                            </button></h6>
+                            </button>
+
+                        </small>
                     </div>
 
-                    <!-- Selección de amo -->
+                    <!-- Selección de Amo -->
                     <div class="mb-3">
                         <label for="id_amo" class="form-label">Nombre del Amo</label>
-                        <select class="form-control" id="id_amo" name="id_amo" required>
+                        <select class="form-select" id="id_amo" name="id_amo" required>
                             <option value="">Selecciona una opción</option>
                             <?php foreach ($datoAmo as $amo): ?>
                                 <option value="<?= htmlspecialchars($amo['id']) ?>">
@@ -47,97 +63,139 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <h6>Si la Propietario no está registrado, <button type="button"
-                                onclick="mostrarModal('amoModal')">
-                                Registrar Propietarios
-                            </button></h6>
+
+                        <small class="text-muted">
+                            Si el propietario no está registrado,
+                            <button type="button" class="btn btn-link p-0" data-bs-toggle="modal"
+                                data-bs-target="#amoModal">
+                                Registrar Propietario
+                            </button>
+
+                        </small>
                     </div>
 
-                    <button type="submit" id="tabla">Registrar Vínculo</button>
+                    <button type="submit" class="btn btn-primary w-100">Registrar Vínculo</button>
                 </form>
             </div>
         </div>
     </main>
 
     <!-- Modal de Mascota -->
-    <div id="mascotaModal" class="modal">
-        <div class="modal-contenido">
-            <span onclick="cerrarModal('mascotaModal')" class="cerrar">&times;</span>
-            <h2>Registrar Mascota</h2>
-            <form action="<?php echo base_url('alta') ?>" method="POST">
-                <label for="nombre">Nombre:</label>
-                <input type="text" name="nombre" required>
+    <div id="mascotaModal" class="modal fade" tabindex="-1" aria-labelledby="mascotaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Ajuste de tamaño más amplio -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="mascotaModalLabel">Registrar Mascota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('alta') ?>" method="POST">
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" name="nombre" class="form-control" value="<?= old('nombre') ?>" required>
+                            <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('nombre')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
-                <label for="especie">Especie:</label>
-                <select name="especie">
-                    <option value="Perro">Perro</option>
-                    <option value="Gato">Gato</option>
-                    <option value="Ave">Ave</option>
-                    <option value="Reptil">Reptil</option>
-                </select>
+                        <!-- Especie -->
+                        <div class="mb-3">
+                            <label for="especie" class="form-label">Especie:</label>
+                            <select name="especie" class="form-select">
+                                <option value="Perro" <?= old('especie') == 'Perro' ? 'selected' : '' ?>>Perro</option>
+                                <option value="Gato" <?= old('especie') == 'Gato' ? 'selected' : '' ?>>Gato</option>
+                                <option value="Ave" <?= old('especie') == 'Ave' ? 'selected' : '' ?>>Ave</option>
+                                <option value="Reptil" <?= old('especie') == 'Reptil' ? 'selected' : '' ?>>Reptil</option>
+                            </select>
+                            <?php if (!empty($validation) && $validation->hasError('especie')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('especie')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
-                <label for="raza">Raza:</label>
-                <input type="text" name="raza">
+                        <!-- Raza -->
+                        <div class="mb-3">
+                            <label for="raza" class="form-label">Raza:</label>
+                            <input type="text" name="raza" class="form-control" value="<?= old('raza') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('raza')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('raza')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
-                <label for="edad">Edad:</label>
-                <input type="number" name="edad">
+                        <!-- Edad -->
+                        <div class="mb-3">
+                            <label for="edad" class="form-label">Edad:</label>
+                            <input type="number" name="edad" class="form-control" value="<?= old('edad') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('edad')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('edad')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
-                <button type="submit">Registrar Mascota</button>
-            </form>
+                        <button type="submit" class="btn btn-success w-100">Registrar Mascota</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
+
     <!-- Modal de Amo -->
-    <div id="amoModal" class="modal">
-        <div class="modal-contenido">
-            <span onclick="cerrarModal('amoModal')" class="cerrar">&times;</span>
-            <h2>Registrar Propietario</h2>
-            <form action="<?php echo base_url('Amos/alta') ?>" method="POST">
-                <label for="nombre" class="form-label">Nombre:</label>
-                <input type="text" name="nombre" placeholder="Nombre" required>
-                <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
-                    <span class="help-block"><?= esc($validation->getError('nombre')) ?></span>
-                <?php endif; ?>
-                <label for="apellido" class="form-label">Apellido:</label>
-                <input type="text" name="apellido" placeholder="Apellido" required>
-                <?php if (!empty($validation) && $validation->hasError('apellido')): ?>
-                    <span class="help-block"><?= esc($validation->getError('apellido')) ?></span>
-                <?php endif; ?>
-                <label for="direccion" class="form-label">Dirección:</label>
-                <input type="text" name="direccion" placeholder="Teléfono">
-                <?php if (!empty($validation) && $validation->hasError('direccion')): ?>
-                    <span class="help-block"><?= esc($validation->getError('direccion')) ?></span>
-                <?php endif; ?>
-                <label for="telefono" class="form-label">Telefono:</label>
-                <input type="text" name="telefono" placeholder="Teléfono">
-                <?php if (!empty($validation) && $validation->hasError('telefono')): ?>
-                    <span class="help-block"><?= esc($validation->getError('telefono')) ?></span>
-                <?php endif; ?>
-                <button type="submit" id="tabla">Registrar Propietario</button>
-            </form>
+    <div id="amoModal" class="modal fade" tabindex="-1" aria-labelledby="amoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Modal más amplio -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="amoModalLabel">Registrar Propietario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="<?= base_url('Amos/alta') ?>" method="POST">
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre:</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Nombre" required
+                                value="<?= old('nombre') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('nombre')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
+                        <!-- Apellido -->
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido:</label>
+                            <input type="text" name="apellido" class="form-control" placeholder="Apellido" required
+                                value="<?= old('apellido') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('apellido')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('apellido')) ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección:</label>
+                            <input type="text" name="direccion" class="form-control" placeholder="Dirección" required
+                                value="<?= old('direccion') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('direccion')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('direccion')) ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono:</label>
+                            <input type="text" name="telefono" class="form-control" placeholder="Teléfono" required
+                                value="<?= old('telefono') ?>">
+                            <?php if (!empty($validation) && $validation->hasError('telefono')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('telefono')) ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Registrar Propietario</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Estilos -->
-    <style>
-       
-    </style>
 
-    <!-- Scripts -->
-    <script>
-        function mostrarModal(id) {
-            document.getElementById(id).style.display = "flex";
-        }
-
-        function cerrarModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-
-        // Cerrar modal con la tecla ESC
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") {
-                cerrarModal("mascotaModal");
-                cerrarModal("amoModal");
-            }
-        });
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
