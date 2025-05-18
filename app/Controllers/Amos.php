@@ -43,26 +43,25 @@ class Amos extends BaseController
         ];
 
         if (!$this->validate($reglas)) {
-            return redirect()->to(base_url('altas')) // Esta es tu vista con el modal incluido
+            session()->setFlashdata('abrir_modal_amo', true); // Mantiene abierto el modal de amo
+            return redirect()->to(base_url('altas'))
                 ->withInput()
-                ->with('validation', $this->validator)
-                ->with('abrir_modal', 'amoModal');
+                ->with('validation', $this->validator);
+        } else {
+            $data = [
+                'id' => rand(100, 999),
+                'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
+                'apellido' => ucfirst(trim($this->request->getPost('apellido'))),
+                'direccion' => ucfirst(trim($this->request->getPost('direccion'))),
+                'telefono' => $this->request->getPost('telefono'),
+                'fecha_alta' => $fechaActual,
+            ];
+
+            $Amo = new AmosModel();
+            $Amo->insertar($data);
+
+            return redirect()->to(base_url('altas'))->with('mensaje', 'Amo registrado exitosamente.');
         }
-
-
-        $data = [
-            'id' => rand(100, 999),
-            'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
-            'apellido' => ucfirst(trim($this->request->getPost('apellido'))),
-            'direccion' => ucfirst(trim($this->request->getPost('direccion'))),
-            'telefono' => $this->request->getPost('telefono'),
-            'fecha_alta' => $fechaActual,
-        ];
-
-        $Amo = new AmosModel();
-        $Amo->insertar($data);
-
-        return redirect()->to(base_url('altas'))->with('mensaje', 'Amo registrado exitosamente.');
     }
     public function mostrar()
     {

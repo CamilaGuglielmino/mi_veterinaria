@@ -22,7 +22,7 @@ class Vistas extends BaseController
         $Mascotas = new MascotasModel();
         
         $datoAmo = $Amo->obtenerAmos();
-        $datoMascota = $Mascotas->mostrar_mascotas();
+        $datoMascota = $Mascotas->obtenerListaMascotas();
 
        return $vistas = view('header') . view('altas/altas', compact('datoMascota', 'datoAmo')) . view('footer');
         

@@ -13,7 +13,7 @@ class MascotasModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
 
-    protected $allowedFields = ['nombre', 'especie', 'raza', 'estado', 'edad', 'fecha_defuncion', 'fecha_fin', 'fecha_modifica'];
+    protected $allowedFields = ['nombre', 'especie', 'raza', 'estado', 'edad', 'fecha_defuncion', 'fecha_fin', 'fecha_modifica', 'amo', 'id_amo'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;

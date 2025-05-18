@@ -1,17 +1,39 @@
 <?php $session = session(); ?>
 <?php $validation = session('validation'); ?>
 
-
-<?php if (session()->has('mensaje')): ?>
-    <?php $mensaje = session()->getFlashdata('mensaje'); ?>
-    <div class="alert <?= strpos($mensaje, 'Error') !== false ? 'alert-danger' : 'alert-success' ?> alert-dismissible fade show"
-        role="alert">
-        <?= $mensaje; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-<?php endif; ?>
-
 <body>
+    <?php if (session()->getFlashdata('abrir_modal') || session()->getFlashdata('abrir_modal_amo')): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Abrir el modal de mascota si hay errores en la validación de mascota
+                if (<?= session()->getFlashdata('abrir_modal') ? 'true' : 'false' ?>) {
+                    var mascotaModal = new bootstrap.Modal(document.getElementById('mascotaModal'));
+                    mascotaModal.show();
+                }
+
+                // Abrir el modal de amo si hay errores en la validación de amo
+                if (<?= session()->getFlashdata('abrir_modal_amo') ? 'true' : 'false' ?>) {
+                    var amoModal = new bootstrap.Modal(document.getElementById('amoModal'));
+                    amoModal.show();
+                }
+            });
+        </script>
+    <?php endif; ?>
+
+
+    <?php
+    session()->remove('abrir_modal'); // Limpia la sesión después de mostrar el modal de mascota
+    session()->remove('abrir_modal_amo'); // Limpia la sesión después de mostrar el modal de amo
+    ?>
+
+    <?php if (session()->has('mensaje')): ?>
+        <?php $mensaje = session()->getFlashdata('mensaje'); ?>
+        <div class="alert <?= strpos($mensaje, 'Error') !== false ? 'alert-danger' : 'alert-success' ?> alert-dismissible fade show"
+            role="alert">
+            <?= $mensaje; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <main class="container mt-4">
         <nav class="nav nav-tabs">
             <ul class="nav">
@@ -59,7 +81,7 @@
                             <option value="">Selecciona una opción</option>
                             <?php foreach ($datoAmo as $amo): ?>
                                 <option value="<?= htmlspecialchars($amo['id']) ?>">
-                                    <?= htmlspecialchars($amo['nombre']) ?>
+                                    <?= htmlspecialchars($amo['nombre'] . ' ' . $amo['apellido']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>

@@ -90,8 +90,11 @@ class Vinculos extends BaseController
         $amoId = $this->request->getPost('id_amo');
         $fechaRegistro = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss');
 
+        // Buscar la mascota
+        $mascota = $Mascotas->find($mascotaId);
+
         // Validación de IDs
-        if (!$Amo->find($amoId) || !$Mascotas->find($mascotaId)) {
+        if (!$Amo->find($amoId) || !$mascota) {
             session()->setFlashdata('error_message', 'Error: Amo o mascota inválidos.');
             return redirect()->to(base_url('/altas'));
         }
@@ -113,13 +116,25 @@ class Vinculos extends BaseController
                 'estado' => 1,
             ];
 
-            if ($vinculoModel->insertar($data)) {
-                session()->setFlashdata('mensaje', 'Vínculo registrado correctamente.');
+            // actualizar datos
+            if ($mascota) {
+                $datoActualizar = [
+                    'amo' => 2, // Valor 2- tiene amo
+                    'id_amo' => $amoId
+                ];
+
+                // Insertar vínculo y actualizar mascota
+                if ($vinculoModel->insertar($data) && $Mascotas->update($mascotaId, $datoActualizar)) {
+                    session()->setFlashdata('mensaje', 'Vínculo registrado y mascota actualizada correctamente.');
+                } else {
+                    session()->setFlashdata('mensaje', 'Error: No se pudo registrar el vínculo o actualizar la mascota.');
+                }
             } else {
-                session()->setFlashdata('mensaje', 'Error: No se pudo registrar el vínculo.');
+                session()->setFlashdata('mensaje', 'Error: No se pudo encontrar la mascota para actualizar.');
             }
         }
 
+        // Guardar datos en la sesión
         session()->set([
             'datoMascota' => $datoMascota,
             'datoAmo' => $datoAmo
@@ -128,59 +143,58 @@ class Vinculos extends BaseController
         return redirect()->to(base_url('/altas'));
     }
 
+    public function bajaMascota()
+    {
+        $relacion = new VinculosModel();
+        $mascota = new MascotasModel();
 
-public function bajaMascota()
-{
-    $relacion = new VinculosModel();
-    $mascota = new MascotasModel();
+        // Obtener datos correctamente
+        $mascotaId = $this->request->getPost('mascota_id');
+        $vinculoId = $this->request->getPost('vinculo_id');
+        $motivo = $this->request->getPost('motivo');
+        $fechaBaja = $this->request->getPost('fecha_baja');
 
-    // Obtener datos correctamente
-    $mascotaId = $this->request->getPost('mascota_id');
-    $vinculoId = $this->request->getPost('vinculo_id'); 
-    $motivo = $this->request->getPost('motivo');
-    $fechaBaja = $this->request->getPost('fecha_baja'); 
+        // Validar existencia en la base de datos
+        $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
+        $vinculoExiste = $relacion->where('id_vinculo', $vinculoId)->first();
 
-    // Validar existencia en la base de datos
-    $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
-    $vinculoExiste = $relacion->where('id_vinculo', $vinculoId)->first();
+        if (!$mascotaExiste) {
+            session()->setFlashdata('mensaje', "Error: La mascota seleccionada no existe.");
+            return redirect()->to('/bajas');
+        }
 
-    if (!$mascotaExiste) {
-        session()->setFlashdata('mensaje', "Error: La mascota seleccionada no existe.");
-        return redirect()->to('/bajas');
+        if (!$vinculoExiste) {
+            session()->setFlashdata('mensaje', "Error: El vínculo seleccionado no existe.");
+            return redirect()->to('/bajas');
+        }
+
+        // Preparar datos para actualización
+        $data = ($motivo === 'fallecimiento') ?
+            ['fecha_defuncion' => $fechaBaja, 'estado' => 2] :
+            ['fecha_fin' => $fechaBaja, 'estado' => 2];
+
+        $dato = ($motivo === 'fallecimiento') ?
+            ['fecha_defuncion' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2] :
+            ['fecha_fin' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2];
+
+        // Ejecutar actualización con `set()`
+        $mascota->set($data)->where('nro_registro', $mascotaId)->update();
+        $relacion->set($dato)->where('id_vinculo', $vinculoId)->update();
+
+        // Validar filas afectadas
+        $mascotaAfectada = $mascota->affectedRows();
+        $relacionAfectada = $relacion->affectedRows();
+
+
+        if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
+            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
+        } else {
+            session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
+        }
+
+
+        return redirect()->to(base_url('/bajas'));
     }
-
-    if (!$vinculoExiste) {
-        session()->setFlashdata('mensaje', "Error: El vínculo seleccionado no existe.");
-        return redirect()->to('/bajas');
-    }
-
-    // Preparar datos para actualización
-    $data = ($motivo === 'fallecimiento') ? 
-        ['fecha_defuncion' => $fechaBaja, 'estado' => 2] : 
-        ['fecha_fin' => $fechaBaja, 'estado' => 2];
-
-    $dato = ($motivo === 'fallecimiento') ? 
-        ['fecha_defuncion' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2] : 
-        ['fecha_fin' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2];
-
-    // Ejecutar actualización con `set()`
-    $mascota->set($data)->where('nro_registro', $mascotaId)->update();
-    $relacion->set($dato)->where('id_vinculo', $vinculoId)->update();
-
-    // Validar filas afectadas
-    $mascotaAfectada = $mascota->affectedRows();
-    $relacionAfectada = $relacion->affectedRows();
-
-
-    if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
-        session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
-    } else {
-        session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
-    }
-
-
-    return redirect()->to(base_url('/bajas'));
-}
 
 
 

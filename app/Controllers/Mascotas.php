@@ -20,16 +20,13 @@ class Mascotas extends BaseController
     {
         $Amo = new AmosModel();
         $Mascotas = new MascotasModel();
-
         $datoAmo = $Amo->obtenerAmos();
         $datoMascota = $Mascotas->mostrar_mascotas();
-
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
-
-        // Generar un número único de registro
-        $dateString = date('mdy'); //Generate a datestring.  
-        $numeroAleatorio = mt_rand(1, 100);
+        $dateString = date('mdy');
+        $numeroAleatorio = mt_rand(1000, 9999);
         $nro_registro = $numeroAleatorio . $dateString;
+
 
         $reglas = [
             'nombre' => [
@@ -40,49 +37,58 @@ class Mascotas extends BaseController
                 ]
             ],
             'raza' => [
-                'rules' => 'required|min_length[3]',
+                'rules' => 'required|alpha|min_length[3]',
                 'errors' => [
                     'required' => 'El campo raza es obligatorio.',
+                    'alpha' => 'La raza solo puede contener letras.',
                     'min_length' => 'La raza debe tener al menos 3 caracteres.'
                 ]
             ],
             'edad' => [
-                'rules' => 'required',
+                'rules' => 'required|integer',
                 'errors' => [
-                    'required' => 'El campo edad es obligatorio.'
+                    'required' => 'El campo edad es obligatorio.',
+                    'integer' => 'La edad debe ser un número entero.'
                 ]
             ],
         ];
 
         if (!$this->validate($reglas)) {
-            return redirect()->to(base_url('altas')) // Esta es tu vista con el modal incluido
+            session()->setFlashdata('abrir_modal', true); // Guarda la variable temporalmente en la sesión
+            return redirect()->to(base_url('altas'))
                 ->withInput()
-                ->with('validation', $this->validator)
-                ->with('abrir_modal', 'mascotaModal');
-        }
-
-        $data = [
-            'nro_registro' => $nro_registro,
-            'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
-            'especie' => $this->request->getPost('especie'),
-            'raza' => ucfirst(trim($this->request->getPost('raza'))),
-            'edad' => $this->request->getPost('edad'),
-            'fecha_alta' => $fecha,
-            'estado' => 1,
-        ];
-
-        $resultado = $Mascotas->insertar($data);
-
-
-        if ($resultado) {
-            $mensaje = "Mascota registrada exitosamente.";
+                ->with('validation', $this->validator);
         } else {
-            $mensaje = "Error: No se pudo registrar la mascota.";
+
+
+            $data = [
+                'nro_registro' => $nro_registro,
+                'nombre' => $this->request->getPost('nombre'),
+                'especie' => $this->request->getPost('especie'),
+                'raza' => $this->request->getPost('raza'),
+                'edad' => (int) $this->request->getPost('edad'),
+                'fecha_alta' => $fecha,
+                'estado' => 1,
+                'amo' => 1, // 1 no tiene amo - 2 sí tiene amo
+
+            ];
+
+
+            if ($Mascotas->insertar($data)) {
+                $mensaje = "Mascota registrada exitosamente.";
+            } else {
+                $mensaje = "Error: No se pudo registrar la mascota.";
+            }
+
+
+            session()->setFlashdata('mensaje', $mensaje);
+            session()->setFlashdata('datoMascota', $datoMascota);
+            session()->setFlashdata('datoAmo', $datoAmo);
+
+            return redirect()->to(base_url('/altas'));
+
         }
 
-        return view('header') .
-            view('altas/altas', ['datoMascota' => $datoMascota, 'datoAmo' => $datoAmo, 'mensaje' => $mensaje]) .
-            view('footer');
     }
     public function bajaMascota()
     {
@@ -141,7 +147,7 @@ class Mascotas extends BaseController
     {
         $mascotaModel = new MascotasModel();
         $listaMascotas = $mascotaModel->obtenerListaMascotasConDueños();
-      
+
 
         return view('header') .
             view('bajas/bajaVinculos', ['listaMascotas' => $listaMascotas]) .
