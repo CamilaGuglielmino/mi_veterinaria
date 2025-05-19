@@ -27,7 +27,6 @@ class Mascotas extends BaseController
         $numeroAleatorio = mt_rand(1000, 9999);
         $nro_registro = $numeroAleatorio . $dateString;
 
-
         $reglas = [
             'nombre' => [
                 'rules' => 'required|min_length[3]',
@@ -47,8 +46,8 @@ class Mascotas extends BaseController
             'edad' => [
                 'rules' => 'required|integer',
                 'errors' => [
-                    'required' => 'El campo edad es obligatorio.',
-                    'integer' => 'La edad debe ser un número entero.'
+                    'required' => 'El teléfono es obligatorio.',
+                    'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
                 ]
             ],
         ];
@@ -88,7 +87,6 @@ class Mascotas extends BaseController
         }
 
     }
-    
     public function mostrar()
     {
         $Amo = new AmosModel();

@@ -113,6 +113,7 @@ class Vinculos extends BaseController
                 'amo_id' => $amoId,
                 'mascota_id' => $mascotaId,
                 'fecha_inicio' => $fechaRegistro,
+                'motivo' => 'Sin motivo',
                 'estado' => 1,
             ];
 
@@ -145,68 +146,37 @@ class Vinculos extends BaseController
 
     public function bajaMascota()
     {
-        $relacion = new VinculosModel();
+        $vinculoModel = new VinculosModel();
         $mascota = new MascotasModel();
-
-        // Obtener datos correctamente
         $mascotaId = $this->request->getPost('mascota_id');
         $vinculoId = $this->request->getPost('vinculo_id');
         $motivo = $this->request->getPost('motivo');
         $fechaBaja = $this->request->getPost('fecha_baja');
 
-        // Validar existencia en la base de datos
-        $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
-        $vinculoExiste = $relacion->where('id_vinculo', $vinculoId)->first();
+        $dato = [
+            'estado' => 2,
+            'fecha_defuncion' => $fechaBaja,
+            'fecha_fin' => $fechaBaja,
+            'amo' => 1,
+            'id_amo' => $mascotaId
+        ];
+        $data = [
+            'fecha_defuncion' => $fechaBaja,
+            'fecha_fin' => $fechaBaja,
+            'motivo' => $motivo,
+            'estado' => 2
+        ];
 
-        $vinculo = $relacion->find($vinculoId);
-      
-        if (!$mascotaExiste) {
-            session()->setFlashdata('mensaje', "Error: La mascota seleccionada no existe.");
-            return redirect()->to('/bajas');
-        }
-
-        if (!$vinculoExiste) {
-            session()->setFlashdata('mensaje', "Error: El vínculo seleccionado no existe.");
-            return redirect()->to('/bajas');
-        }
-
-        if ($motivo === 'fallecimiento') {
-            // Actualizar mascota columna por columna pero en una sola ejecución
-            $mascota->set('estado', 2)
-                ->set('fecha_defuncion', $fechaBaja)
-                ->set('amo', 1)
-                ->set('id_amo', 0)
-                ->where('nro_registro', $mascotaId)
-                ->update();
-            // Actualizar vínculo columna por columna en una sola ejecución
-            $relacion->set('fecha_defuncion', $fechaBaja)
-                ->set('motivo', $motivo)
-                ->set('estado', 2)
-                ->where('id_vinculo', $vinculoId)
-                ->update();
-        } elseif ($motivo === 'venta') {
-            // Actualizar mascota columna por columna pero en una sola ejecución
-            $mascota->set('estado', 2)
-                ->set('fecha_fin', $fechaBaja)
-                ->set('amo', 1)
-                ->set('id_amo', 0)
-                ->where('nro_registro', $mascotaId)
-                ->update();
-
-            // Actualizar vínculo columna por columna en una sola ejecución
-            $relacion->set('fecha_fin', $fechaBaja)
-                ->set('motivo', $motivo)
-                ->set('estado', 2)
-                ->where('id_vinculo', $vinculoId)
-                ->update();
+        if ($vinculoModel->update($vinculoId, $data) && $mascota->update($mascotaId, $dato)) {
+            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
+            return redirect()->to(base_url('/bajas'));
 
         } else {
             session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
             return redirect()->to(base_url('/bajas'));
         }
 
-        session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
-        return redirect()->to(base_url('/bajas'));
+
     }
 
 }

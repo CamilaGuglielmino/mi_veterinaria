@@ -13,7 +13,6 @@ class Veterinarios extends BaseController
         $vistas = view('header') . view('altas/altasVeterinario', ['datoVeterinario' => $datoVeterinario]) . view('footer');
         return $vistas;
     }
-
     public function alta()
     {
         // Formatear fecha actual
@@ -21,17 +20,21 @@ class Veterinarios extends BaseController
 
         $reglas = [
             'nombre' => [
-                'rules' => 'required|min_length[3]',
+                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
                 'errors' => [
-                    'required' => 'El campo nombre es obligatorio.',
-                    'min_length' => 'El nombre debe tener al menos 3 caracteres.'
+                    'required' => 'El nombre es obligatorio.',
+                    'alpha_space' => 'El nombre solo puede contener letras y espacios.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.',
+                    'max_length' => 'El nombre no puede superar los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|min_length[3]',
+                'rules' => 'required|alpha_space|min_length[3]|max_length[50]]',
                 'errors' => [
-                    'required' => 'El campo apellido es obligatorio.',
-                    'min_length' => 'El apellido debe tener al menos 3 caracteres.'
+                    'required' => 'El apellido es obligatorio.',
+                    'alpha_space' => 'El apellido solo puede contener letras y espacios.',
+                    'min_length' => 'El apellido debe tener al menos 3 caracteres.',
+                    'max_length' => 'El apellido no puede superar los 50 caracteres.'
                 ]
             ],
             'telefono' => [
@@ -68,7 +71,6 @@ class Veterinarios extends BaseController
         return redirect()->to(base_url('altasVeterinario'))->with('mensaje', 'Veterinario registrado exitosamente.');
 
     }
-
     public function obtenerVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();
@@ -83,7 +85,6 @@ class Veterinarios extends BaseController
             view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
             view('footer');
     }
-
     public function cargarBajaVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();
@@ -94,7 +95,6 @@ class Veterinarios extends BaseController
             view('bajas/bajaVeterinario', ['veterinario' => $veterinario, 'listaVeterinarios' => $listaVeterinarios]) .
             view('footer');
     }
-
     public function bajaVeterinarios()
     {
         $veterinarioModel = new VeterinariosModel();

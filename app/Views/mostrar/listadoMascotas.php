@@ -52,7 +52,7 @@
                             <th>Fecha de Alta</th>
                             <th>Estado</th>
                             <th>Motivo</th>
-                            <th>Fecha de Defunción</th>
+                            <th>Fecha de Baja</th>
                             <th>Amo actual</th>
                             <th>Historial de Amos</th>
                         </tr>
