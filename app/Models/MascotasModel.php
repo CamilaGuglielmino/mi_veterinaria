@@ -127,13 +127,14 @@ class MascotasModel extends Model
             ->groupBy('mascotas.nro_registro');
     }
     public function obtenerListaMascotas()
-    {
-        return $this->db->table('mascotas')
-            ->select('nro_registro, nombre, especie, raza, edad')
-            ->where('estado !=', 2) // Filtra las mascotas activas
-            ->get()
-            ->getResultArray();
-    }
+{
+    return $this->db->table('mascotas')
+        ->select('nro_registro, nombre, especie, raza, edad')
+        ->where('estado !=', 2) // Filtra las mascotas activas
+        ->where('amo !=', 2) // Filtra solo las mascotas que tienen amo
+        ->get()
+        ->getResultArray();
+}
    public function obtenerListaMascotasConDueños()
 {
     return $this->db->table('mascotas')

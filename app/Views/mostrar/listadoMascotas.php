@@ -53,7 +53,8 @@
                             <th>Estado</th>
                             <th>Motivo</th>
                             <th>Fecha de Defunción</th>
-                            <th>Amos</th>
+                            <th>Amo actual</th>
+                            <th>Historial de Amos</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,6 +69,7 @@
                                 <td><?= $estado ?></td>
                                 <td><?= !empty($mascota['motivo']) ? esc($mascota['motivo']) : 'Sin registro' ?></td>
                                 <td><?= !empty($mascota['fecha_defuncion']) && $mascota['estado'] !== '1' ? date("d/m/Y", strtotime(esc($mascota['fecha_defuncion']))) : '-' ?></td>
+                                <td><?= esc($mascota['id_amo']) ?></td>
                                 <td><?= !empty($mascota['amos']) ? esc($mascota['amos']) : 'Sin historial' ?></td>
                             </tr>
                         <?php endforeach; ?>

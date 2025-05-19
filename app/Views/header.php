@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,8 +5,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Mi Veterinaria</title>
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/css.css" rel="stylesheet">
 </head>
@@ -17,8 +12,13 @@
 <body>
     <header class="d-flex justify-content-between align-items-center p-3 bg-light border-bottom shadow-sm">
         <div class="left">
-            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                <span class="navbar-toggler-icon"></span>
+            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list"
+                    viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M2 12.5a.5.5 0 0 1 0-1h12a.5.5 0 0 1 0 1H2Zm0-5a.5.5 0 0 1 0-1h12a.5.5 0 0 1 0 1H2Zm0-5a.5.5 0 0 1 0-1h12a.5.5 0 0 1 0 1H2Z" />
+                </svg>
             </button>
         </div>
         <div class="right">
@@ -65,7 +65,7 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/scripts.js"></script>
 </body>

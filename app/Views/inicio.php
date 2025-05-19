@@ -1,5 +1,3 @@
-
-
 <div class="container text-center mt-5">
     <img src="icons/icons/logo.png" alt="Logo" class="img-fluid mb-4" style="max-height: 150px;">
     <h1 class="fw-bold">Bienvenidos a Mi Veterinaria 🐾</h1>
@@ -12,6 +10,4 @@
         <li class="list-group-item">✅ Dar de baja registros cuando sea necesario.</li>
         <li class="list-group-item">✅ Explorar información sobre nuestras mascotas y el equipo veterinario.</li>
     </ul>
-
-    <p class="mt-4">¡Gracias por confiar en nosotros! 🐶🐱</p>
 </div>

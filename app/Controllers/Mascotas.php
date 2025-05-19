@@ -59,8 +59,6 @@ class Mascotas extends BaseController
                 ->withInput()
                 ->with('validation', $this->validator);
         } else {
-
-
             $data = [
                 'nro_registro' => $nro_registro,
                 'nombre' => $this->request->getPost('nombre'),
@@ -90,50 +88,7 @@ class Mascotas extends BaseController
         }
 
     }
-    public function bajaMascota()
-    {
-        $relacion = new VinculosModel();
-        $mascota = new MascotasModel();
-
-        // Obtener datos
-        $mascotaId = $this->request->getPost('mascota_id');
-        $motivo = $this->request->getPost('motivo');
-        $fecha = Time::now()->toDateString();
-
-        // Validar existencia en la base de datos
-        $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
-        $relacionExiste = $relacion->where('mascota_id', $mascotaId)->first();
-
-        if (!$mascotaExiste || !$relacionExiste) {
-            session()->setFlashdata('mensaje', "Error: La mascota o su vínculo no existen en la base de datos.");
-            return redirect()->to('/bajas');
-        }
-
-        // Preparar datos para actualización
-        $data = ($motivo === 'fallecimiento') ?
-            ['fecha_defuncion' => $fecha, 'estado' => 2] :
-            ['fecha_fin' => $fecha, 'estado' => 2];
-
-        $dato = ($motivo === 'fallecimiento') ?
-            ['fecha_defuncion' => $fecha, 'motivo' => $motivo, 'estado' => 2] :
-            ['fecha_fin' => $fecha, 'motivo' => $motivo, 'estado' => 2];
-
-        // Ejecutar actualización con `set()` para evitar problemas con NULL
-        $mascota->set($data)->where('nro_registro', $mascotaId)->update();
-        $relacion->set($dato)->where('mascota_id', $mascotaId)->update();
-
-        // Validar filas afectadas
-        $mascotaAfectada = $mascota->affectedRows();
-        $relacionAfectada = $relacion->affectedRows();
-
-        if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
-            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
-        } else {
-            session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
-        }
-
-        return redirect()->to('/bajas');
-    }
+    
     public function mostrar()
     {
         $Amo = new AmosModel();

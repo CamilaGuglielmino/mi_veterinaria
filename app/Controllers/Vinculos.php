@@ -158,6 +158,8 @@ class Vinculos extends BaseController
         $mascotaExiste = $mascota->where('nro_registro', $mascotaId)->first();
         $vinculoExiste = $relacion->where('id_vinculo', $vinculoId)->first();
 
+        $vinculo = $relacion->find($vinculoId);
+      
         if (!$mascotaExiste) {
             session()->setFlashdata('mensaje', "Error: La mascota seleccionada no existe.");
             return redirect()->to('/bajas');
@@ -168,35 +170,43 @@ class Vinculos extends BaseController
             return redirect()->to('/bajas');
         }
 
-        // Preparar datos para actualización
-        $data = ($motivo === 'fallecimiento') ?
-            ['fecha_defuncion' => $fechaBaja, 'estado' => 2] :
-            ['fecha_fin' => $fechaBaja, 'estado' => 2];
+        if ($motivo === 'fallecimiento') {
+            // Actualizar mascota columna por columna pero en una sola ejecución
+            $mascota->set('estado', 2)
+                ->set('fecha_defuncion', $fechaBaja)
+                ->set('amo', 1)
+                ->set('id_amo', 0)
+                ->where('nro_registro', $mascotaId)
+                ->update();
+            // Actualizar vínculo columna por columna en una sola ejecución
+            $relacion->set('fecha_defuncion', $fechaBaja)
+                ->set('motivo', $motivo)
+                ->set('estado', 2)
+                ->where('id_vinculo', $vinculoId)
+                ->update();
+        } elseif ($motivo === 'venta') {
+            // Actualizar mascota columna por columna pero en una sola ejecución
+            $mascota->set('estado', 2)
+                ->set('fecha_fin', $fechaBaja)
+                ->set('amo', 1)
+                ->set('id_amo', 0)
+                ->where('nro_registro', $mascotaId)
+                ->update();
 
-        $dato = ($motivo === 'fallecimiento') ?
-            ['fecha_defuncion' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2] :
-            ['fecha_fin' => $fechaBaja, 'motivo' => $motivo, 'estado' => 2];
+            // Actualizar vínculo columna por columna en una sola ejecución
+            $relacion->set('fecha_fin', $fechaBaja)
+                ->set('motivo', $motivo)
+                ->set('estado', 2)
+                ->where('id_vinculo', $vinculoId)
+                ->update();
 
-        // Ejecutar actualización con `set()`
-        $mascota->set($data)->where('nro_registro', $mascotaId)->update();
-        $relacion->set($dato)->where('id_vinculo', $vinculoId)->update();
-
-        // Validar filas afectadas
-        $mascotaAfectada = $mascota->affectedRows();
-        $relacionAfectada = $relacion->affectedRows();
-
-
-        if ($mascotaAfectada > 0 && $relacionAfectada > 0) {
-            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
         } else {
             session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
+            return redirect()->to(base_url('/bajas'));
         }
 
-
+        session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
         return redirect()->to(base_url('/bajas'));
     }
-
-
-
 
 }

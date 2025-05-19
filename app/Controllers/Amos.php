@@ -71,7 +71,6 @@ class Amos extends BaseController
         $amos = $amoModel->findAll();
 
         foreach ($amos as &$amo) {
-            // Buscar todas las mascotas asociadas a este amo
             $mascotas = $relacionModel->where('amo_id', $amo['id'])->findAll();
             $amo['mascotas'] = !empty($mascotas) ? array_column($mascotas, 'nombre_mascota') : [];
         }

@@ -24,8 +24,7 @@
             <div id="bajasMascotas" class="tab-pane active">
                 <form method="POST" action="<?= base_url('bajaMascota') ?>" class="bg-light p-4 rounded shadow">
                     <h2 class="text-center fw-bold mb-4">Bajas de Mascotas</h2>
-
-                    <!-- Selección de Mascota -->
+                    <!-- Mascota -->
                     <div class="mb-3">
                         <label for="mascota_id" class="form-label">Seleccionar Mascota:</label>
                         <select name="mascota_id" id="mascota_id" class="form-select" required>
@@ -38,12 +37,8 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
-
-
-
                     </div>
-
-                    <!-- Motivo de Baja -->
+                    <!--Baja -->
                     <div class="mb-3">
                         <label for="motivo" class="form-label">Motivo de Baja:</label>
                         <select name="motivo" id="motivo" class="form-select" required>
@@ -51,10 +46,6 @@
                             <option value="fallecimiento">Fallecimiento</option>
                         </select>
                     </div>
-
-
-
-                    <!-- Fecha de Baja -->
                     <div class="mb-3">
                         <label for="fecha_baja" class="form-label">Fecha de Baja:</label>
                         <input type="date" name="fecha_baja" id="fecha_baja" class="form-control" required>
@@ -62,7 +53,6 @@
 
                     <button type="submit" class="btn btn-danger w-100">Registrar Baja</button>
                 </form>
-
             </div>
         </div>
     </main>

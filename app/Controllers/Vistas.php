@@ -36,6 +36,4 @@ class Vistas extends BaseController
         return $vistas;
     }
 
-
-
 }

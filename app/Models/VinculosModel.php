@@ -9,16 +9,17 @@ class VinculosModel extends Model
     protected $returnType = 'array';
     protected $useSoftDeletes = false;
 
-    protected $allowedFields = ['amo_id', 'mascotas_id', 'fecha_inicio', 'fecha_defuncion','fecha_fin', 'motivo', 'estado'];
+    protected $allowedFields = ['amo_id', 'mascota_id', 'fecha_inicio', 'fecha_defuncion','fecha_fin', 'motivo', 'estado'];
+
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     // Dates
     protected $useTimestamps = true;
-    protected $dateFormat = 'datetime'; // Cambiado a un formato válido
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
+    protected $dateFormat = 'date'; // Cambiado a un formato válido
+    protected $createdField = '';
+    protected $updatedField = '';
 
 
     protected $validationRules = [
