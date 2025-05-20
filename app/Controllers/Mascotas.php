@@ -110,7 +110,7 @@ class Mascotas extends BaseController
     {
         $mascotasModel = new MascotasModel();
         $mascotas = [];
-        $listaMascotas = $mascotasModel->obtenerListaMascotas();
+        $listaMascotas = $mascotasModel->obtenerListaMascotasTodo();
 
         return view('header') .
             view('/mostrar/listadoMascotas', ['listaMascotas' => $listaMascotas, 'mascotas' => $mascotas]) .
@@ -136,7 +136,35 @@ class Mascotas extends BaseController
         $raza = $this->request->getPost('raza');
         $edad = $this->request->getPost('edad');
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
-
+ $reglas = [
+            'nombre' => [
+                'rules' => 'required|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo nombre es obligatorio.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'raza' => [
+                'rules' => 'required|alpha|min_length[3]',
+                'errors' => [
+                    'required' => 'El campo raza es obligatorio.',
+                    'alpha' => 'La raza solo puede contener letras.',
+                    'min_length' => 'La raza debe tener al menos 3 caracteres.'
+                ]
+            ],
+            'edad' => [
+                'rules' => 'required|integer',
+                'errors' => [
+                    'required' => 'El teléfono es obligatorio.',
+                    'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
+                ]
+            ],
+        ];
+        if (!$this->validate($reglas)) {
+            return redirect()->to(base_url('modificarMascota'))
+                ->withInput()
+                ->with('validation', $this->validator);
+        } else {
 
         if (!empty($mascotaId)) {
             // Actualizar datos del amo
@@ -164,5 +192,5 @@ class Mascotas extends BaseController
         session()->setFlashdata('listaMascostas', $listaMascostas);
 
         return redirect()->to(base_url('/modificarMascota'));
-    }
+    }}
 }

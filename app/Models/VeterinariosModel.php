@@ -13,10 +13,6 @@ class VeterinariosModel extends Model
     protected $allowedFields = ['nombre', 'apellido', 'especialidad', 'telefono','fecha_creacion', 'fecha_egreso', 'fecha_modifica', 'estado'];
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
-    protected $validationRules = [];
-    protected $validationMessages = [];
-    protected $skipValidation = false;
-    protected $cleanValidationRules = true;
 
     public function insertar($data)
     {
@@ -28,14 +24,18 @@ class VeterinariosModel extends Model
     {
         return $this->findAll();
     }
+    public function obtenerV()
+{
+    return $this->db->table('veterinarios')->select('*');
+}
+
     public function obtener()
-    {
-        return $this->db->table('veterinarios')
-            ->select('veterinarios.*, GROUP_CONCAT(mascotas.nombre SEPARATOR ", ") AS mascotas_atendidas')
-            ->join('vinculo', 'veterinarios.id = vinculo.veterinario_id', 'left')
-            ->join('mascotas', 'vinculo.mascota_id = mascotas.nro_registro', 'left')
-            ->groupBy('veterinarios.id');
-    }
+{
+    return $this->db->table('veterinarios')
+        ->select('*') // Obtiene todos los campos de la tabla veterinarios
+        ->get()
+        ->getResultArray(); // Devuelve los resultados en formato de array
+}
 
     public function obtenerLista()
     {

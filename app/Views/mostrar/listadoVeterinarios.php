@@ -1,12 +1,12 @@
 <body>
     <?php if (session()->has('mensaje')): ?>
-    <?php $mensaje = session()->getFlashdata('mensaje'); ?>
-    <div class="alert <?= strpos($mensaje, 'Error') !== false ? 'alert-danger' : 'alert-success' ?> alert-dismissible fade show"
-        role="alert">
-        <?= $mensaje; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-<?php endif; ?>
+        <?php $mensaje = session()->getFlashdata('mensaje'); ?>
+        <div class="alert <?= strpos($mensaje, 'Error') !== false ? 'alert-danger' : 'alert-success' ?> alert-dismissible fade show"
+            role="alert">
+            <?= $mensaje; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
     <main class="container mt-4">
         <nav class="nav nav-tabs">
             <ul class="nav">
@@ -32,7 +32,7 @@
                     <option value="">Ver Todos</option>
                     <?php foreach ($listaVeterinarios as $veterinario): ?>
                         <option value="<?= esc($veterinario['id']) ?>" <?= isset($veterinarioId) && $veterinarioId == $veterinario['id'] ? 'selected' : '' ?>>
-                            <?= esc($veterinario['nombre']) ?> <?= esc($veterinario['apellido']) ?>
+                            <?= esc($veterinario['nombre']) ?>     <?= esc($veterinario['apellido']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -40,7 +40,7 @@
             <button type="submit" class="btn btn-primary w-100">Buscar</button>
         </form>
 
-        <?php if (!empty($veterinarios)): ?> 
+        <?php if (!empty($veterinarios)): ?>
             <div class="table-responsive mt-4">
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
@@ -52,7 +52,6 @@
                             <th>Teléfono</th>
                             <th>Fecha de Ingreso</th>
                             <th>Fecha de Egreso</th>
-                            <th>Mascotas Atendidas</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,13 +63,12 @@
                                 <td><?= esc($veterinario['especialidad']) ?></td>
                                 <td><?= esc($veterinario['telefono']) ?></td>
                                 <td><?= date("d/m/Y", strtotime(esc($veterinario['fecha_creacion']))) ?></td>
-                                <td><?= date("d/m/Y", strtotime(esc($veterinario['fecha_egreso'] ?: 'Activo') )) ?></td>
-                                <td><?= !empty($veterinario['mascotas_atendidas']) ? esc($veterinario['mascotas_atendidas']) : 'Sin mascotas registradas' ?></td>
+                               <td><?= !empty($veterinario['fecha_egreso']) ? date("d/m/Y", strtotime(esc($veterinario['fecha_egreso']))) : 'Activo' ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-        <?php endif; ?> 
+        <?php endif; ?>
     </main>
 </body>

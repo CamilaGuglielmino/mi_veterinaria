@@ -12,27 +12,26 @@ use CodeIgniter\I18n\Time;
 class Vinculos extends BaseController
 {
     public function mostrarM()
-    {
-        $mascotaModel = new MascotasModel();
-        $mascotaId = $this->request->getGet('mascota'); // Capturamos la selección
-        $listaMascotas = $mascotaModel->obtenerListaMascotasTodo();
+{
+    $mascotaModel = new MascotasModel();
+    $mascotaId = $this->request->getGet('mascota'); // Capturar selección
+    $listaMascotas = $mascotaModel->obtenerListaMascotasTodo();
 
-        // Inicializar la consulta
-        $query = $mascotaModel->obtenerMascotasConDueñosMotvio();
+    // Inicializar la consulta sin ejecutarla
+    $query = $mascotaModel->obtenerMascotasConAmo();
 
-        // Filtrar por ID solo si hay una selección válida
-        if (!empty($mascotaId) && $mascotaId !== "todos") {
-            $query->where('mascotas.nro_registro', $mascotaId);
-        }
-
-        // Obtener los resultados
-        $mascotas = $query->get()->getResultArray();
-
-        return view('header')
-            . view('mostrar/listadoMascotas', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas])
-            . view('footer');
+    // Filtrar por ID solo si hay una selección válida
+    if (!empty($mascotaId) && $mascotaId !== "todos") {
+        $query->where('mascotas.nro_registro', $mascotaId);
     }
 
+    // Ejecutar la consulta y obtener los resultados
+    $mascotas = $query->get()->getResultArray();
+
+    return view('header')
+        . view('mostrar/listadoMascotas', ['mascotas' => $mascotas, 'listaMascotas' => $listaMascotas])
+        . view('footer');
+}
     public function mostrarA()
     {
         $amoModel = new AmosModel();
@@ -56,27 +55,27 @@ class Vinculos extends BaseController
     }
 
 
-    public function mostrarV()
-    {
-        $veterinarioModel = new VeterinariosModel();
-        $veterinarioId = $this->request->getGet('veterinario'); // Capturamos la selección
-        $listaVeterinarios = $veterinarioModel->obtenerListaTodo();
+   public function mostrarV()
+{
+    $veterinarioModel = new VeterinariosModel();
+    $veterinarioId = $this->request->getGet('veterinario'); // Capturamos la selección
+    $listaVeterinarios = $veterinarioModel->obtenerListaTodo();
 
-        // Inicializar la consulta
-        $query = $veterinarioModel->obtener();
+    // Inicializar la consulta
+    $query = $veterinarioModel->obtenerV();
 
-        // Filtrar solo si hay una selección válida
-        if (!empty($veterinarioId)) {
-            $query->where('veterinarios.id', $veterinarioId);
-        }
-
-        // Obtener los resultados
-        $veterinarios = $query->get()->getResultArray();
-
-        return view('header')
-            . view('mostrar/listadoVeterinarios', ['veterinarios' => $veterinarios, 'listaVeterinarios' => $listaVeterinarios])
-            . view('footer');
+    // Filtrar solo si hay una selección válida
+    if (!empty($veterinarioId)) {
+        $query->where('id', $veterinarioId); // No es necesario 'veterinarios.id'
     }
+
+    // Obtener los resultados
+    $veterinarios = $query->get()->getResultArray();
+
+    return view('header')
+        . view('mostrar/listadoVeterinarios', ['veterinarios' => $veterinarios, 'listaVeterinarios' => $listaVeterinarios])
+        . view('footer');
+}
     public function alta()
     {
         $vinculoModel = new VinculosModel();
@@ -152,14 +151,25 @@ class Vinculos extends BaseController
         $vinculoId = $this->request->getPost('vinculo_id');
         $motivo = $this->request->getPost('motivo');
         $fechaBaja = $this->request->getPost('fecha_baja');
-
+        if($motivo==='fallecimiento'){
         $dato = [
-            'estado' => 2,
+            'estado' => 2, //para que esta mascota no pueda volver a tener dueño
             'fecha_defuncion' => $fechaBaja,
             'fecha_fin' => $fechaBaja,
             'amo' => 1,
-            'id_amo' => $mascotaId
+            'id_amo' => 0
         ];
+        }else{
+
+
+        $dato = [
+            'estado' => 1,
+            'fecha_defuncion' => $fechaBaja,
+            'fecha_fin' => $fechaBaja,
+            'amo' => 1,
+            'id_amo' => 0
+        ];
+    }
         $data = [
             'fecha_defuncion' => $fechaBaja,
             'fecha_fin' => $fechaBaja,

@@ -75,33 +75,42 @@ class MascotasModel extends Model
             ->groupBy('mascotas.nro_registro');
     }
     public function obtenerListaMascotas()
-{
-    return $this->db->table('mascotas')
-        ->select('nro_registro, nombre, especie, raza, edad')
-        ->where('estado !=', 2) // Filtra las mascotas activas
-        ->where('amo !=', 2) // Filtra solo las mascotas que tienen amo
-        ->get()
-        ->getResultArray();
-}
-   public function obtenerListaMascotasConDueños()
-{
-    return $this->db->table('mascotas')
-        ->select('mascotas.nro_registro, mascotas.nombre, GROUP_CONCAT(amos.nombre SEPARATOR ", ") AS amos, amo_mascota.id_vinculo, amo_mascota.fecha_inicio')
-        ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'inner')
-        ->join('amos', 'amo_mascota.amo_id = amos.id', 'inner')
-        ->where('mascotas.estado !=', 2) // Excluir mascotas dadas de baja
-        ->groupBy('mascotas.nro_registro, amo_mascota.id_vinculo')
-        ->get()
-        ->getResultArray();
-}
-public function obtenerListaMascotasTodo()
     {
         return $this->db->table('mascotas')
             ->select('nro_registro, nombre, especie, raza, edad')
-            
+            ->where('estado !=', 2) // Filtra las mascotas activas
+            ->where('amo !=', 2) // Filtra solo las mascotas que tienen amo
             ->get()
             ->getResultArray();
     }
+    public function obtenerListaMascotasConDueños()
+    {
+        return $this->db->table('mascotas')
+            ->select('mascotas.nro_registro, mascotas.nombre, GROUP_CONCAT(amos.nombre SEPARATOR ", ") AS amos, amo_mascota.id_vinculo, amo_mascota.fecha_inicio')
+            ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'inner')
+            ->join('amos', 'amo_mascota.amo_id = amos.id', 'inner')
+            ->where('mascotas.estado !=', 2) // Excluir mascotas dadas de baja
+            ->groupBy('mascotas.nro_registro, amo_mascota.id_vinculo')
+            ->get()
+            ->getResultArray();
+    }
+    public function obtenerListaMascotasTodo()
+    {
+        return $this->db->table('mascotas')
+            ->select('nro_registro, nombre, especie, raza, edad')
+
+            ->get()
+            ->getResultArray();
+    }
+   public function obtenerMascotasConAmo()
+{
+    return $this->db->table('mascotas')
+        ->select('mascotas.*, amos.nombre AS amo_nombre, amos.apellido AS amo_apellido, GROUP_CONCAT(CONCAT(amo_hist.nombre, " ", amo_hist.apellido) SEPARATOR ", ") AS historial_amos')
+        ->join('amos', 'mascotas.id_amo = amos.id', 'left') // Amo actual
+        ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'left') // Historial de amos
+        ->join('amos AS amo_hist', 'amo_mascota.amo_id = amo_hist.id', 'left') // Traer nombres y apellidos de los amos históricos
+        ->groupBy('mascotas.nro_registro'); // Agrupar por mascota para concatenar los amos anteriores
+}
 
 
 

@@ -29,7 +29,7 @@ class Veterinarios extends BaseController
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]]',
+                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El apellido es obligatorio.',
                     'alpha_space' => 'El apellido solo puede contener letras y espacios.',
@@ -79,7 +79,7 @@ class Veterinarios extends BaseController
         $veterinarios = [];
 
         // Obtener la lista de veterinarios para el select
-        $listaVeterinarios = $veterinarioModel->obtenerLista();
+        $listaVeterinarios = $veterinarioModel->obtenerListaTodo();
 
         return view('header') .
             view('/mostrar/listadoVeterinarios', ['listaVeterinarios' => $listaVeterinarios, 'veterinarios' => $veterinarios]) .
@@ -151,33 +151,68 @@ class Veterinarios extends BaseController
         $especialidad = $this->request->getPost('especialidad');
         $telefono = $this->request->getPost('telefono');
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
+        $reglas = [
+            'nombre' => [
+                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'errors' => [
+                    'required' => 'El nombre es obligatorio.',
+                    'alpha_space' => 'El nombre solo puede contener letras y espacios.',
+                    'min_length' => 'El nombre debe tener al menos 3 caracteres.',
+                    'max_length' => 'El nombre no puede superar los 50 caracteres.'
+                ]
+            ],
+            'apellido' => [
+                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'errors' => [
+                    'required' => 'El apellido es obligatorio.',
+                    'alpha_space' => 'El apellido solo puede contener letras y espacios.',
+                    'min_length' => 'El apellido debe tener al menos 3 caracteres.',
+                    'max_length' => 'El apellido no puede superar los 50 caracteres.'
+                ]
+            ],
+            'telefono' => [
+                'rules' => 'required|min_length[10]',
+                'errors' => [
+                    'required' => 'El campo teléfono es obligatorio.',
+                    'min_length' => 'El teléfono debe tener al menos 10 caracteres.'
+                ]
+            ],
+        ];
 
-
-        if (!empty($veterinarioId)) {
-            // Actualizar datos del amo
-            $resultado = $veterinarioModel->set([
-                'nombre' => $nombre,
-                'apellido' => $apellido,
-                'especialidad' => $especialidad,
-                'telefono' => $telefono,
-                'fecha_modifica' => $fecha
-            ])
-                ->where('id', $veterinarioId)
-                ->update();
-
-            // Verificar si se actualizó correctamente
-            if ($resultado) {
-                $mensaje = "Datos del amo actualizados correctamente.";
-            } else {
-                $mensaje = "Error: No se pudo modificar la información.";
-            }
+        if (!$this->validate($reglas)) {
+            return redirect()->to(base_url('modificarVeterinario'))
+                ->withInput()
+                ->with('validation', $this->validator);
         } else {
-            $mensaje = "Error: No se recibió un ID válido.";
+            if (!empty($veterinarioId)) {
+                // Actualizar datos del amo
+                $resultado = $veterinarioModel->set([
+                    'nombre' => $nombre,
+                    'apellido' => $apellido,
+                    'especialidad' => $especialidad,
+                    'telefono' => $telefono,
+                    'fecha_modifica' => $fecha
+                ])
+                    ->where('id', $veterinarioId)
+                    ->update();
+
+                // Verificar si se actualizó correctamente
+                if ($resultado) {
+                    $mensaje = "Datos del amo actualizados correctamente.";
+                } else {
+                    $mensaje = "Error: No se pudo modificar la información.";
+                }
+            } else {
+                $mensaje = "Error: No se recibió un ID válido.";
+            }
+
+            session()->setFlashdata('mensaje', $mensaje);
+            session()->setFlashdata('listaVeterinarios', $listaVeterinarios);
+
+            return redirect()->to(base_url('/modificarVeterinario'));
         }
 
-        session()->setFlashdata('mensaje', $mensaje);
-        session()->setFlashdata('listaVeterinarios', $listaVeterinarios);
 
-        return redirect()->to(base_url('/modificarVeterinario'));
+
     }
 }

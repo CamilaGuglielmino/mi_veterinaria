@@ -68,9 +68,12 @@
                                 <td><?= date("d/m/Y", strtotime(esc($mascota['fecha_alta']))) ?></td>
                                 <td><?= $estado ?></td>
                                 <td><?= !empty($mascota['motivo']) ? esc($mascota['motivo']) : 'Sin registro' ?></td>
-                                <td><?= !empty($mascota['fecha_defuncion']) && $mascota['estado'] !== '1' ? date("d/m/Y", strtotime(esc($mascota['fecha_defuncion']))) : '-' ?></td>
-                                <td><?= esc($mascota['id_amo']) ?></td>
-                                <td><?= !empty($mascota['amos']) ? esc($mascota['amos']) : 'Sin historial' ?></td>
+                                <td><?= !empty($mascota['fecha_fin']) && $mascota['estado'] !== '1' ? date("d/m/Y", strtotime(esc($mascota['fecha_fin']))) : '-' ?>
+                                </td>
+                                <td><?= !empty($mascota['amo_nombre']) ? esc($mascota['amo_nombre']) . ' ' . esc($mascota['amo_apellido']) : '' ?>
+                                </td>
+                                <td><?= !empty($mascota['historial_amos']) ? esc($mascota['historial_amos']) : 'Sin historial' ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
