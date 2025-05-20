@@ -90,6 +90,7 @@ class MascotasModel extends Model
             ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'inner')
             ->join('amos', 'amo_mascota.amo_id = amos.id', 'inner')
             ->where('mascotas.estado !=', 2) // Excluir mascotas dadas de baja
+            ->where('amo_mascota.estado !=', 2) 
             ->groupBy('mascotas.nro_registro, amo_mascota.id_vinculo')
             ->get()
             ->getResultArray();
@@ -102,23 +103,17 @@ class MascotasModel extends Model
             ->get()
             ->getResultArray();
     }
-   public function obtenerMascotasConAmo()
+public function obtenerMascotasConAmo()
 {
     return $this->db->table('mascotas')
-        ->select('mascotas.*, amos.nombre AS amo_nombre, amos.apellido AS amo_apellido, GROUP_CONCAT(CONCAT(amo_hist.nombre, " ", amo_hist.apellido) SEPARATOR ", ") AS historial_amos')
+        ->select('mascotas.*, amos.nombre AS amo_nombre, amos.apellido AS amo_apellido, 
+                  GROUP_CONCAT(CONCAT(amo_hist.nombre, " ", amo_hist.apellido) SEPARATOR ", ") AS historial_amos,
+                  amo_mascota.motivo AS motivo_vinculo') // Seleccionar motivo como columna separada
         ->join('amos', 'mascotas.id_amo = amos.id', 'left') // Amo actual
         ->join('amo_mascota', 'mascotas.nro_registro = amo_mascota.mascota_id', 'left') // Historial de amos
-        ->join('amos AS amo_hist', 'amo_mascota.amo_id = amo_hist.id', 'left') // Traer nombres y apellidos de los amos históricos
-        ->groupBy('mascotas.nro_registro'); // Agrupar por mascota para concatenar los amos anteriores
+        ->join('amos AS amo_hist', 'amo_mascota.amo_id = amo_hist.id', 'left') // Traer nombres y apellidos de amos históricos
+        ->groupBy('mascotas.nro_registro'); // Agrupar por mascota para evitar duplicados
 }
-
-
-
-
-
-
-
-
 
 }
 

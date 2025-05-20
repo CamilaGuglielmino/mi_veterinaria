@@ -57,7 +57,7 @@
                         <?php foreach ($amos as $amo): ?>
                             <tr>
                                 <td><?= esc($amo['id']) ?></td>
-                                <td><?= esc($amo['nombre']) ?></td>
+                                <td><?= esc($amo['nombre']) ?> <?= esc($amo['apellido']) ?></td>
                                 <td><?= esc($amo['direccion']) ?></td>
                                 <td><?= esc($amo['telefono']) ?></td>
                                

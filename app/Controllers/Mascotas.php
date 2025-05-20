@@ -23,10 +23,15 @@ class Mascotas extends BaseController
         $datoAmo = $Amo->obtenerAmos();
         $datoMascota = $Mascotas->mostrar_mascotas();
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
-        $dateString = date('mdy');
-        $numeroAleatorio = mt_rand(1000, 9999);
-        $nro_registro = $numeroAleatorio . $dateString;
 
+        // Generación única de número de registro
+        do {
+            $dateString = date('y'); // Año en dos dígitos
+            $numeroAleatorio = mt_rand(1000, 9999); // Número aleatorio de 4 dígitos
+            $nro_registro = $numeroAleatorio . $dateString;
+        } while ($Mascotas->where('nro_registro', $nro_registro)->countAllResults() > 0); // Asegurar que no se repita
+
+        // Validaciones
         $reglas = [
             'nombre' => [
                 'rules' => 'required|min_length[3]',
@@ -36,24 +41,25 @@ class Mascotas extends BaseController
                 ]
             ],
             'raza' => [
-                'rules' => 'required|alpha|min_length[3]',
+                'rules' => 'required|regex_match[/^[a-zA-Z\s]+$/]|min_length[3]',
                 'errors' => [
                     'required' => 'El campo raza es obligatorio.',
-                    'alpha' => 'La raza solo puede contener letras.',
+                    'regex_match' => 'La raza solo puede contener letras y espacios.',
                     'min_length' => 'La raza debe tener al menos 3 caracteres.'
                 ]
             ],
             'edad' => [
-                'rules' => 'required|integer',
+                'rules' => 'required|integer|greater_than[0]',
                 'errors' => [
-                    'required' => 'El teléfono es obligatorio.',
-                    'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
+                    'required' => 'El campo edad es obligatorio.',
+                    'integer' => 'La edad debe ser un número entero.',
+                    'greater_than' => 'La edad debe ser mayor que 0.'
                 ]
             ],
         ];
 
         if (!$this->validate($reglas)) {
-            session()->setFlashdata('abrir_modal', true); // Guarda la variable temporalmente en la sesión
+            session()->setFlashdata('abrir_modal', true);
             return redirect()->to(base_url('altas'))
                 ->withInput()
                 ->with('validation', $this->validator);
@@ -66,26 +72,21 @@ class Mascotas extends BaseController
                 'edad' => (int) $this->request->getPost('edad'),
                 'fecha_alta' => $fecha,
                 'estado' => 1,
-                'amo' => 1, // 1 no tiene amo - 2 sí tiene amo
-
+                'amo' => 1, // 1 = No tiene amo, 2 = Tiene amo
             ];
 
-
-            if ($Mascotas->insertar($data)) {
+            if ($Mascotas->insert($data)) {
                 $mensaje = "Mascota registrada exitosamente.";
             } else {
                 $mensaje = "Error: No se pudo registrar la mascota.";
             }
-
 
             session()->setFlashdata('mensaje', $mensaje);
             session()->setFlashdata('datoMascota', $datoMascota);
             session()->setFlashdata('datoAmo', $datoAmo);
 
             return redirect()->to(base_url('/altas'));
-
         }
-
     }
     public function mostrar()
     {
@@ -136,7 +137,7 @@ class Mascotas extends BaseController
         $raza = $this->request->getPost('raza');
         $edad = $this->request->getPost('edad');
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
- $reglas = [
+        $reglas = [
             'nombre' => [
                 'rules' => 'required|min_length[3]',
                 'errors' => [
@@ -166,31 +167,32 @@ class Mascotas extends BaseController
                 ->with('validation', $this->validator);
         } else {
 
-        if (!empty($mascotaId)) {
-            // Actualizar datos del amo
-            $resultado = $mascotasModel->set([
-                'nombre' => $nombre,
-                'especie' => $especie,
-                'raza' => $raza,
-                'edad' => $edad,
-                'fecha_modifica' => $fecha
-            ])
-                ->where('nro_registro', $mascotaId)
-                ->update();
+            if (!empty($mascotaId)) {
+                // Actualizar datos del amo
+                $resultado = $mascotasModel->set([
+                    'nombre' => $nombre,
+                    'especie' => $especie,
+                    'raza' => $raza,
+                    'edad' => $edad,
+                    'fecha_modifica' => $fecha
+                ])
+                    ->where('nro_registro', $mascotaId)
+                    ->update();
 
-            // Verificar si se actualizó correctamente
-            if ($resultado) {
-                $mensaje = "Datos del amo actualizados correctamente.";
+                // Verificar si se actualizó correctamente
+                if ($resultado) {
+                    $mensaje = "Datos del amo actualizados correctamente.";
+                } else {
+                    $mensaje = "Error: No se pudo modificar la información.";
+                }
             } else {
-                $mensaje = "Error: No se pudo modificar la información.";
+                $mensaje = "Error: No se recibió un ID válido.";
             }
-        } else {
-            $mensaje = "Error: No se recibió un ID válido.";
+
+            session()->setFlashdata('mensaje', $mensaje);
+            session()->setFlashdata('listaMascostas', $listaMascostas);
+
+            return redirect()->to(base_url('/modificarMascota'));
         }
-
-        session()->setFlashdata('mensaje', $mensaje);
-        session()->setFlashdata('listaMascostas', $listaMascostas);
-
-        return redirect()->to(base_url('/modificarMascota'));
-    }}
+    }
 }
