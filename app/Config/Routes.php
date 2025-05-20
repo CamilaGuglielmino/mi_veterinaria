@@ -13,8 +13,6 @@ $routes->get('/altasVeterinario', 'Veterinarios::vista');
 $routes->get('altasVeterinario', 'Veterinarios::vista');
 
 
-
-
 /**MOSTRAR*/
 $routes->get('/mostrar', 'Vinculos::mostrarA');
 $routes->get('amosMostrar', 'Amos::obtenerAmos');

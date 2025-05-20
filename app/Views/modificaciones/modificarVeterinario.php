@@ -37,8 +37,7 @@
                             onchange="cargarDatosVeterinario()" required>
                             <option value="">Seleccione un veterinario</option>
                             <?php foreach ($listaVeterinarios as $veterinario): ?>
-                                <option value="<?= esc($veterinario['id']) ?>" <?= old('veterinario_id') == $veterinario['id'] ? 'selected' : '' ?>
-                                    data-nombre="<?= esc($veterinario['nombre']) ?>"
+                                <option value="<?= esc($veterinario['id']) ?>" <?= old('veterinario_id') == $veterinario['id'] ? 'selected' : '' ?> data-nombre="<?= esc($veterinario['nombre']) ?>"
                                     data-apellido="<?= esc($veterinario['apellido']) ?>"
                                     data-especialidad="<?= esc($veterinario['especialidad']) ?>"
                                     data-telefono="<?= esc($veterinario['telefono']) ?>">
@@ -48,11 +47,13 @@
                         </select>
                     </div>
 
-                    <!-- Información de Veterinario -->
-                    <div id="tablaVeterinario" class="<?= old('nombre') || old('apellido') || old('especialidad') || old('telefono') ? '' : 'd-none' ?>">
+                    <div id="tablaVeterinario"
+                        class="<?= old('nombre') || old('apellido') || old('especialidad') || old('telefono') ? '' : 'd-none' ?>">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre:</label>
-                            <input type="text" name="nombre" id="nombre" class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('nombre') ? 'is-invalid' : '' ?>" value="<?= old('nombre') ?>" required>
+                            <input type="text" name="nombre" id="nombre"
+                                class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('nombre') ? 'is-invalid' : '' ?>"
+                                value="<?= old('nombre') ?>" required>
                             <?php if (!empty($validation) && $validation->hasError('nombre')): ?>
                                 <span class="text-danger"><?= esc($validation->getError('nombre')) ?></span>
                             <?php endif; ?>
@@ -60,35 +61,39 @@
 
                         <div class="mb-3">
                             <label for="apellido" class="form-label">Apellido:</label>
-                            <input type="text" name="apellido" id="apellido" class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('apellido') ? 'is-invalid' : '' ?>" value="<?= old('apellido') ?>" required>
+                            <input type="text" name="apellido" id="apellido"
+                                class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('apellido') ? 'is-invalid' : '' ?>"
+                                value="<?= old('apellido') ?>" required>
                             <?php if (!empty($validation) && $validation->hasError('apellido')): ?>
                                 <span class="text-danger"><?= esc($validation->getError('apellido')) ?></span>
                             <?php endif; ?>
                         </div>
 
-                
+
                         <div class="mb-3">
-                        <label for="especialidad" class="form-label">Especialidad:</label>
-                       <select class="form-select" id="especialidad" name="especialidad" required>
-    <option value="">Selecciona una opción</option>
-    <option value="Animales domésticos" <?= old('especialidad') == 'Animales domésticos' ? 'selected' : '' ?>>Animales domésticos</option>
-    <option value="Animales de producción" <?= old('especialidad') == 'Animales de producción' ? 'selected' : '' ?>>Animales de producción</option>
-    <option value="Animales exóticos" <?= old('especialidad') == 'Animales exóticos' ? 'selected' : '' ?>>Animales exóticos</option>
-    <option value="Especialidades clínicas" <?= old('especialidad') == 'Especialidades clínicas' ? 'selected' : '' ?>>Especialidades clínicas</option>
-    <option value="Especialidades de laboratorio" <?= old('especialidad') == 'Especialidades de laboratorio' ? 'selected' : '' ?>>Especialidades de laboratorio</option>
-    <option value="Salud pública veterinaria" <?= old('especialidad') == 'Salud pública veterinaria' ? 'selected' : '' ?>>Salud pública veterinaria</option>
-    <option value="Otro" <?= old('especialidad') == 'Otro' ? 'selected' : '' ?>>Otro</option>
-</select>
+                            <label for="especialidad" class="form-label">Especialidad:</label>
+                            <select class="form-select" id="especialidad" name="especialidad" required>
+                                <option value="">Selecciona una opción</option>
+                                <option value="Animales domésticos" <?= old('especialidad') == 'Animales domésticos' ? 'selected' : '' ?>>Animales domésticos</option>
+                                <option value="Animales de producción" <?= old('especialidad') == 'Animales de producción' ? 'selected' : '' ?>>Animales de producción</option>
+                                <option value="Animales exóticos" <?= old('especialidad') == 'Animales exóticos' ? 'selected' : '' ?>>Animales exóticos</option>
+                                <option value="Especialidades clínicas" <?= old('especialidad') == 'Especialidades clínicas' ? 'selected' : '' ?>>Especialidades clínicas</option>
+                                <option value="Especialidades de laboratorio" <?= old('especialidad') == 'Especialidades de laboratorio' ? 'selected' : '' ?>>Especialidades de laboratorio</option>
+                                <option value="Salud pública veterinaria" <?= old('especialidad') == 'Salud pública veterinaria' ? 'selected' : '' ?>>Salud pública veterinaria</option>
+                                <option value="Otro" <?= old('especialidad') == 'Otro' ? 'selected' : '' ?>>Otro</option>
+                            </select>
 
 
-                        <?php if (!empty($validation) && $validation->hasError('especialidad')): ?>
-                            <span class="text-danger"><?= esc($validation->getError('especialidad')) ?></span>
-                        <?php endif; ?>
-                    </div>
+                            <?php if (!empty($validation) && $validation->hasError('especialidad')): ?>
+                                <span class="text-danger"><?= esc($validation->getError('especialidad')) ?></span>
+                            <?php endif; ?>
+                        </div>
 
                         <div class="mb-3">
                             <label for="telefono" class="form-label">Teléfono:</label>
-                            <input type="text" name="telefono" id="telefono" class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('telefono') ? 'is-invalid' : '' ?>" value="<?= old('telefono') ?>" required>
+                            <input type="text" name="telefono" id="telefono"
+                                class="form-control <?= session()->getFlashdata('validation') && session()->getFlashdata('validation')->hasError('telefono') ? 'is-invalid' : '' ?>"
+                                value="<?= old('telefono') ?>" required>
                             <?php if (!empty($validation) && $validation->hasError('telefono')): ?>
                                 <span class="text-danger"><?= esc($validation->getError('telefono')) ?></span>
                             <?php endif; ?>
@@ -101,7 +106,6 @@
         </div>
     </main>
 
-    <!-- Script para manejar la carga de datos del veterinario -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let select = document.getElementById('veterinario_id');

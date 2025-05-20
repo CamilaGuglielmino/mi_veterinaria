@@ -49,6 +49,11 @@
                     <div class="mb-3">
                         <label for="fecha_baja" class="form-label">Fecha de Baja:</label>
                         <input type="date" name="fecha_baja" id="fecha_baja" class="form-control" required>
+                        <?php if (isset($validation)): ?>
+                            <div class="alert alert-danger">
+                                <?= $validation->listErrors(); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <button type="submit" class="btn btn-danger w-100">Registrar Baja</button>

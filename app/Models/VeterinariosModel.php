@@ -40,7 +40,7 @@ class VeterinariosModel extends Model
     public function obtenerLista()
     {
         return $this->db->table('veterinarios')
-            ->select('id, nombre, apellido, especialidad, telefono')
+            ->select('id, nombre, apellido, especialidad, telefono, fecha_creacion')
             ->where('estado !=', 2) // Filtra los veterinarios activos
             ->get()
             ->getResultArray();

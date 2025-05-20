@@ -30,9 +30,16 @@
                         <select name="veterinario_id" id="veterinario_id" class="form-select" required>
                             <option value="">Selecciona una opción</option>
                             <?php foreach ($listaVeterinarios as $veterinario): ?>
+                                <?php
+                                $fechaAlta = new DateTime($veterinario['fecha_creacion']);
+                                $fechaFormateada = $fechaAlta->format('d-m-Y'); // Cambiar a DD-MM-YYYY
+                                ?>
+
                                 <option value="<?= esc($veterinario['id']) ?>">
                                     <?= esc($veterinario['nombre']) ?>     <?= esc($veterinario['apellido']) ?> -
-                                    <?= esc($veterinario['especialidad']) ?>
+                                    <?= esc($veterinario['especialidad']) ?> - Alta:
+                                    <?= esc($fechaFormateada) ?>
+
                                 </option>
 
                             <?php endforeach; ?>

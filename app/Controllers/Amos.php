@@ -15,34 +15,33 @@ class Amos extends BaseController
         $id_amo = "$numeroAleatorio.$dateString";
         $reglas = [
             'nombre' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El campo nombre es obligatorio.',
-                    'alpha_space' => 'El nombre solo puede contener letras y espacios.',
+                    'regex_match' => 'El nombre solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El nombre debe tener al menos 3 caracteres.',
                     'max_length' => 'El nombre no puede superar los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El apellido es obligatorio.',
-                    'alpha_space' => 'El apellido solo puede contener letras y espacios.',
+                    'regex_match' => 'El apellido solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El apellido debe tener al menos 3 caracteres.',
                     'max_length' => 'El apellido no puede superar los 50 caracteres.'
                 ]
             ],
             'direccion' => [
-                'rules' => 'required|string|min_length[5]|max_length[100]',
+                'rules' => 'required|min_length[5]|max_length[100]',
                 'errors' => [
                     'required' => 'La dirección es obligatoria.',
-                    'string' => 'La dirección debe ser un texto válido.',
                     'min_length' => 'La dirección debe tener al menos 5 caracteres.',
                     'max_length' => 'La dirección no puede superar los 100 caracteres.'
                 ]
             ],
             'telefono' => [
-                'rules' => 'required|regex_match[/^\+?\d{7,15}$/]',
+                'rules' => 'required|regex_match[/^\+?[0-9]{7,15}$/]',
                 'errors' => [
                     'required' => 'El teléfono es obligatorio.',
                     'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
@@ -111,34 +110,33 @@ class Amos extends BaseController
         $fecha = Time::now()->toLocalizedString('yyyy-MM-dd');
         $reglas = [
             'nombre' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El campo nombre es obligatorio.',
-                    'alpha_space' => 'El nombre solo puede contener letras y espacios.',
+                    'regex_match' => 'El nombre solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El nombre debe tener al menos 3 caracteres.',
                     'max_length' => 'El nombre no puede superar los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El apellido es obligatorio.',
-                    'alpha_space' => 'El apellido solo puede contener letras y espacios.',
+                    'regex_match' => 'El apellido solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El apellido debe tener al menos 3 caracteres.',
                     'max_length' => 'El apellido no puede superar los 50 caracteres.'
                 ]
             ],
             'direccion' => [
-                'rules' => 'required|string|min_length[5]|max_length[100]',
+                'rules' => 'required|min_length[5]|max_length[100]',
                 'errors' => [
                     'required' => 'La dirección es obligatoria.',
-                    'string' => 'La dirección debe ser un texto válido.',
                     'min_length' => 'La dirección debe tener al menos 5 caracteres.',
                     'max_length' => 'La dirección no puede superar los 100 caracteres.'
                 ]
             ],
             'telefono' => [
-                'rules' => 'required|regex_match[/^\+?\d{7,15}$/]',
+                'rules' => 'required|regex_match[/^\+?[0-9]{7,15}$/]',
                 'errors' => [
                     'required' => 'El teléfono es obligatorio.',
                     'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
@@ -152,7 +150,7 @@ class Amos extends BaseController
         } else {
 
             if (!empty($amoId)) {
-                // Actualizar datos del amo
+
                 $resultado = $amoModel->set([
                     'nombre' => $nombre,
                     'apellido' => $apellido,
@@ -163,8 +161,6 @@ class Amos extends BaseController
                 ])
                     ->where('id', $amoId)
                     ->update();
-
-                // Verificar si se actualizó correctamente
                 if ($resultado) {
                     $mensaje = "Datos del amo actualizados correctamente.";
                 } else {

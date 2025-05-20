@@ -67,8 +67,12 @@
                                 <td><?= esc($mascota['edad']) ?></td>
                                 <td><?= date("d/m/Y", strtotime(esc($mascota['fecha_alta']))) ?></td>
                                 <td><?= $estado ?></td>
-                                <td><?= !empty($mascota['motivo_vinculo']) ? esc($mascota['motivo_vinculo']) : 'Sin motivo' ?></td>
-                                <td><?= !empty($mascota['fecha_fin']) && $mascota['estado'] !== '1' ? date("d/m/Y", strtotime(esc($mascota['fecha_fin']))) : '-' ?>
+                                <td><?= !empty($mascota['motivo_vinculo']) ? esc($mascota['motivo_vinculo']) : 'Sin motivo' ?>
+                                </td>
+                                <td>
+                                    <?= (!empty($mascota['fecha_fin']) && $mascota['fecha_fin'] !== '0000-00-00')
+                                        ? date("d/m/Y", strtotime(esc($mascota['fecha_fin'])))
+                                        : '-' ?>
                                 </td>
                                 <td><?= !empty($mascota['amo_nombre']) ? esc($mascota['amo_nombre']) . ' ' . esc($mascota['amo_apellido']) : '' ?>
                                 </td>

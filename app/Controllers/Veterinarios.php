@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\VeterinariosModel;
 use CodeIgniter\I18n\Time;
+use DateTime;
 
 class Veterinarios extends BaseController
 {
@@ -20,19 +21,19 @@ class Veterinarios extends BaseController
 
         $reglas = [
             'nombre' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El nombre es obligatorio.',
-                    'alpha_space' => 'El nombre solo puede contener letras y espacios.',
+                    'regex_match' => 'El nombre solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El nombre debe tener al menos 3 caracteres.',
                     'max_length' => 'El nombre no puede superar los 50 caracteres.'
                 ]
             ],
             'apellido' => [
-                'rules' => 'required|alpha_space|min_length[3]|max_length[50]',
+                'rules' => 'required|regex_match[/^[\p{L} ]+$/u]|min_length[3]|max_length[50]',
                 'errors' => [
                     'required' => 'El apellido es obligatorio.',
-                    'alpha_space' => 'El apellido solo puede contener letras y espacios.',
+                    'regex_match' => 'El apellido solo puede contener letras, espacios y caracteres acentuados.',
                     'min_length' => 'El apellido debe tener al menos 3 caracteres.',
                     'max_length' => 'El apellido no puede superar los 50 caracteres.'
                 ]
@@ -52,7 +53,7 @@ class Veterinarios extends BaseController
                 ->with('validation', $this->validator);
         }
 
-        // Datos a insertar
+        
         $data = [
             'id' => mt_rand(1, 999),
             'nombre' => ucfirst(trim($this->request->getPost('nombre'))),
@@ -63,11 +64,11 @@ class Veterinarios extends BaseController
             'estado' => 1,
         ];
 
-        // Insertar en la base de datos y verificar si fue exitoso
+       
         $Veterinario = new VeterinariosModel();
         $Veterinario->insert($data);
 
-        // Retornar la vista con validación y mensaje
+        
         return redirect()->to(base_url('altasVeterinario'))->with('mensaje', 'Veterinario registrado exitosamente.');
 
     }
@@ -100,10 +101,33 @@ class Veterinarios extends BaseController
         $veterinarioModel = new VeterinariosModel();
         $listaVeterinarios = $veterinarioModel->obtenerLista();
 
-
         $veterinariosId = $this->request->getPost('veterinario_id');
         $fecha = $this->request->getPost('fecha_fin');
 
+        // Definir reglas de validación en el controlador
+        $reglas = [
+            'fecha_fin' => [ // Coincide con el nombre en el POST
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'La fecha de baja es obligatoria.'
+                ]
+            ]
+        ];
+
+        // Validar primero con CodeIgniter
+        if (!$this->validate($reglas)) {
+            session()->setFlashdata('mensaje', 'Error: La fecha de baja es obligatoria.');
+            return redirect()->to(base_url('/bajasVeterinarios'))
+                ->withInput()
+                ->with('validation', $this->validator);
+        }
+
+        // Validación manual con método personalizado
+        if (!$this->validarFechaBaja($fecha, $veterinariosId, $veterinarioModel)) {
+            session()->setFlashdata('mensaje', 'Error: La fecha de baja debe ser posterior a la fecha de alta.');
+            return redirect()->to(base_url('/bajasVeterinarios'))
+                ->withInput();
+        }
 
         if (!empty($veterinariosId)) {
             // Ejecutar la actualización de fecha de egreso y estado
@@ -114,11 +138,7 @@ class Veterinarios extends BaseController
                 ->where('id', $veterinariosId)
                 ->update();
 
-            if ($resultado) {
-                $mensaje = "Baja del veterinario exitosa.";
-            } else {
-                $mensaje = "Error: No se pudo actualizar la base de datos.";
-            }
+            $mensaje = $resultado ? "Baja del veterinario exitosa." : "Error: No se pudo actualizar la base de datos.";
         } else {
             $mensaje = "Error: No se recibió un ID válido.";
         }
@@ -126,8 +146,6 @@ class Veterinarios extends BaseController
         session()->setFlashdata('listaVeterinarios', $listaVeterinarios);
         session()->setFlashdata('mensaje', $mensaje);
         return redirect()->to(base_url('/bajasVeterinarios'));
-
-
     }
     public function vistaModificar()
     {
@@ -185,7 +203,7 @@ class Veterinarios extends BaseController
                 ->with('validation', $this->validator);
         } else {
             if (!empty($veterinarioId)) {
-                // Actualizar datos del amo
+                
                 $resultado = $veterinarioModel->set([
                     'nombre' => $nombre,
                     'apellido' => $apellido,
@@ -196,9 +214,8 @@ class Veterinarios extends BaseController
                     ->where('id', $veterinarioId)
                     ->update();
 
-                // Verificar si se actualizó correctamente
                 if ($resultado) {
-                    $mensaje = "Datos del amo actualizados correctamente.";
+                    $mensaje = "Datos del Veterinario actualizados correctamente.";
                 } else {
                     $mensaje = "Error: No se pudo modificar la información.";
                 }
@@ -214,5 +231,18 @@ class Veterinarios extends BaseController
 
 
 
+    }
+    public function validarFechaBaja($fecha, $veterinarioId, $veterinarioModel)
+    {
+        $veterinario = $veterinarioModel->where('id', $veterinarioId)->first();
+
+        if (!$veterinario) {
+            return false; // Mascota no encontrada
+        }
+
+        $fechaAlta = new DateTime($veterinario['fecha_creacion']);
+        $fechaBajaObj = new DateTime($fecha);
+
+        return $fechaBajaObj > $fechaAlta;
     }
 }

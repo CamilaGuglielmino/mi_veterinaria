@@ -168,7 +168,7 @@ class Mascotas extends BaseController
         } else {
 
             if (!empty($mascotaId)) {
-                // Actualizar datos del amo
+               
                 $resultado = $mascotasModel->set([
                     'nombre' => $nombre,
                     'especie' => $especie,
@@ -179,9 +179,8 @@ class Mascotas extends BaseController
                     ->where('nro_registro', $mascotaId)
                     ->update();
 
-                // Verificar si se actualizó correctamente
                 if ($resultado) {
-                    $mensaje = "Datos del amo actualizados correctamente.";
+                    $mensaje = "Datos de la mascota actualizados correctamente.";
                 } else {
                     $mensaje = "Error: No se pudo modificar la información.";
                 }

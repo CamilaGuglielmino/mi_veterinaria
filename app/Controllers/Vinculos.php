@@ -7,6 +7,7 @@ use App\Models\MascotasModel;
 use App\Models\VeterinariosModel;
 use App\Models\VinculosModel;
 use CodeIgniter\I18n\Time;
+use DateTime;
 
 
 class Vinculos extends BaseController
@@ -14,18 +15,15 @@ class Vinculos extends BaseController
     public function mostrarM()
     {
         $mascotaModel = new MascotasModel();
-        $mascotaId = $this->request->getGet('mascota'); // Capturar selección
+        $mascotaId = $this->request->getGet('mascota');
         $listaMascotas = $mascotaModel->obtenerListaMascotasTodo();
 
-        // Inicializar la consulta sin ejecutarla
         $query = $mascotaModel->obtenerMascotasConAmo();
 
-        // Filtrar por ID solo si hay una selección válida
         if (!empty($mascotaId) && $mascotaId !== "todos") {
             $query->where('mascotas.nro_registro', $mascotaId);
         }
 
-        // Ejecutar la consulta y obtener los resultados
         $mascotas = $query->get()->getResultArray();
 
         return view('header')
@@ -38,15 +36,12 @@ class Vinculos extends BaseController
         $amoId = $this->request->getGet('amo');
         $listaAmos = $amoModel->obtenerListaAmos();
 
-        // Inicializar la consulta
         $query = $amoModel->obtenerAmo();
 
-        // Filtrar solo si hay una selección válida
         if (!empty($amoId) && $amoId !== "todos") {
             $query->where('amos.id', $amoId);
         }
 
-        // Obtener los resultados
         $amos = $query->get()->getResultArray();
 
         return view('header')
@@ -58,18 +53,15 @@ class Vinculos extends BaseController
     public function mostrarV()
     {
         $veterinarioModel = new VeterinariosModel();
-        $veterinarioId = $this->request->getGet('veterinario'); // Capturamos la selección
+        $veterinarioId = $this->request->getGet('veterinario');
         $listaVeterinarios = $veterinarioModel->obtenerListaTodo();
 
-        // Inicializar la consulta
         $query = $veterinarioModel->obtenerV();
 
-        // Filtrar solo si hay una selección válida
         if (!empty($veterinarioId)) {
-            $query->where('id', $veterinarioId); // No es necesario 'veterinarios.id'
+            $query->where('id', $veterinarioId);
         }
 
-        // Obtener los resultados
         $veterinarios = $query->get()->getResultArray();
 
         return view('header')
@@ -89,16 +81,14 @@ class Vinculos extends BaseController
         $amoId = $this->request->getPost('id_amo');
         $fechaRegistro = Time::now()->toLocalizedString('yyyy-MM-dd HH:mm:ss');
 
-        // Buscar la mascota
         $mascota = $Mascotas->find($mascotaId);
 
-        // Validación de IDs
         if (!$Amo->find($amoId) || !$mascota) {
             session()->setFlashdata('error_message', 'Error: Amo o mascota inválidos.');
             return redirect()->to(base_url('/altas'));
         }
 
-        // Verificar si ya existe el vínculo
+
         $existeVinculo = $vinculoModel->where('mascota_id', $mascotaId)
             ->where('amo_id', $amoId)
             ->first();
@@ -106,7 +96,7 @@ class Vinculos extends BaseController
         if ($existeVinculo) {
             session()->setFlashdata('mensaje', 'Error: Este vínculo ya existe.');
         } else {
-            // Crear nuevo vínculo
+
             $data = [
                 'id_vinculo' => mt_rand(100, 1000),
                 'amo_id' => $amoId,
@@ -116,14 +106,13 @@ class Vinculos extends BaseController
                 'estado' => 1,
             ];
 
-            // actualizar datos
+
             if ($mascota) {
                 $datoActualizar = [
                     'amo' => 2, // Valor 2- tiene amo
                     'id_amo' => $amoId
                 ];
 
-                // Insertar vínculo y actualizar mascota
                 if ($vinculoModel->insertar($data) && $Mascotas->update($mascotaId, $datoActualizar)) {
                     session()->setFlashdata('mensaje', 'Vínculo registrado y mascota actualizada correctamente.');
                 } else {
@@ -134,7 +123,6 @@ class Vinculos extends BaseController
             }
         }
 
-        // Guardar datos en la sesión
         session()->set([
             'datoMascota' => $datoMascota,
             'datoAmo' => $datoAmo
@@ -145,71 +133,73 @@ class Vinculos extends BaseController
 
     public function bajaMascota()
     {
-        $vinculoModel = new VinculosModel();
         $mascotaModel = new MascotasModel();
+        $vinculoModel = new VinculosModel();
+
         $mascotaId = $this->request->getPost('mascota_id');
-        $vinculoId = $this->request->getPost('vinculo_id');
-        $motivo = $this->request->getPost('motivo');
         $fechaBaja = $this->request->getPost('fecha_baja');
+
+        $reglas = [
+            'fecha_baja' => [
+                'rules' => 'required',
+                'errors' => [
+                    'required' => 'La fecha de baja es obligatoria.'
+                ]
+            ]
+        ];
+
+        if (!$this->validate($reglas)) {
+            session()->setFlashdata('mensaje', 'Error: La fecha de baja es obligatoria.');
+            return redirect()->to(base_url('/bajas'))
+                ->withInput()
+                ->with('validation', $this->validator);
+        }
+
+        if (!$this->validarFechaBaja($fechaBaja, $mascotaId, $mascotaModel)) {
+            session()->setFlashdata('mensaje', 'Error: La fecha de baja debe ser posterior a la fecha de alta.');
+            return redirect()->to(base_url('/bajas'))
+                ->withInput();
+        }
+
+        $motivo = $this->request->getPost('motivo');
+        $vinculoId = $this->request->getPost('vinculo_id');
+
+        $data = [
+            'fecha_defuncion' => $fechaBaja,
+            'fecha_fin' => $fechaBaja,
+            'motivo' => $motivo,
+            'estado' => ($motivo === 'fallecimiento') ? 2 : 1
+        ];
+
+        $mascotaData = [
+            'estado' => ($motivo === 'fallecimiento') ? 2 : 1,
+            'fecha_defuncion' => $fechaBaja,
+            'fecha_fin' => $fechaBaja,
+            'amo' => 1,
+            'id_amo' => 0
+        ];
+
+        if ($vinculoModel->update($vinculoId, $data) && $mascotaModel->update($mascotaId, $mascotaData)) {
+            session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
+            return redirect()->to(base_url('/bajas'));
+        } else {
+            session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
+            return redirect()->to(base_url('/bajas'));
+        }
+    }
+
+
+    public function validarFechaBaja($fechaBaja, $mascotaId, $mascotaModel)
+    {
         $mascota = $mascotaModel->where('nro_registro', $mascotaId)->first();
 
         if (!$mascota) {
-            return redirect()->back()->with('mensaje', 'Error: Mascota no encontrada.');
+            return false;
         }
 
-        $fechaAltaTimestamp = strtotime($mascota['fecha_alta']);
-        $fechaBajaTimestamp = strtotime($fechaBaja);
+        $fechaAlta = new DateTime($mascota['fecha_alta']);
+        $fechaBajaObj = new DateTime($fechaBaja);
 
-        // Validar que la fecha de baja sea mayor a la fecha de alta
-        if ($fechaBajaTimestamp <= $fechaAltaTimestamp) {
-            return redirect()->back()->withInput()->with('mensaje', 'Error: La fecha de baja debe ser posterior a la fecha de alta.');
-        } else {
-
-            if ($motivo === 'fallecimiento') {
-                $dato = [
-                    'estado' => 2, //para que esta mascota no pueda volver a tener dueño
-                    'fecha_defuncion' => $fechaBaja,
-                    'fecha_fin' => $fechaBaja,
-                    'amo' => 1,
-                    'id_amo' => 0
-                ];
-                 $data = [
-                'fecha_defuncion' => $fechaBaja,
-                'fecha_fin' => $fechaBaja,
-                'motivo' => $motivo,
-                'estado' => 2
-            ];
-            } else {
-
-
-                $dato = [
-                    'estado' => 1,
-                    'fecha_defuncion' => $fechaBaja,
-                    'fecha_fin' => $fechaBaja,
-                    'amo' => 1,
-                    'id_amo' => 0
-                ]; 
-                $data = [
-                'fecha_defuncion' => $fechaBaja,
-                'fecha_fin' => $fechaBaja,
-                'motivo' => $motivo,
-                'estado' => 2
-            ];
-            }
-         
-
-            if ($vinculoModel->update($vinculoId, $data) && $mascotaModel->update($mascotaId, $dato)) {
-                session()->setFlashdata('mensaje', "Baja de la mascota registrada exitosamente.");
-                return redirect()->to(base_url('/bajas'));
-
-            } else {
-                session()->setFlashdata('mensaje', "Error: No se realizó ninguna actualización.");
-                return redirect()->to(base_url('/bajas'));
-            }
-        }
-
-
-
+        return $fechaBajaObj > $fechaAlta;
     }
-
 }

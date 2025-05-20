@@ -22,7 +22,7 @@ class Vistas extends BaseController
         $Mascotas = new MascotasModel();
         
         $datoAmo = $Amo->obtenerAmos();
-        $datoMascota = $Mascotas->obtenerListaMascotas(); //filtra mascotas activas y sin amos
+        $datoMascota = $Mascotas->obtenerListaMascotas(); 
 
        return $vistas = view('header') . view('altas/altas', compact('datoMascota', 'datoAmo')) . view('footer');
         
