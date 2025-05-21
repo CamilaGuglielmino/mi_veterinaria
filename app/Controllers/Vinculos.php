@@ -97,6 +97,9 @@ class Vinculos extends BaseController
             session()->setFlashdata('mensaje', 'Error: Este vínculo ya existe.');
         } else {
 
+            $dato=[
+                'mascota_actual'=>$mascotaId,
+            ];
             $data = [
                 'id_vinculo' => mt_rand(100, 1000),
                 'amo_id' => $amoId,
@@ -114,7 +117,10 @@ class Vinculos extends BaseController
                 ];
 
                 if ($vinculoModel->insertar($data) && $Mascotas->update($mascotaId, $datoActualizar)) {
+                    if($Amo->update($amoId, $dato)){
                     session()->setFlashdata('mensaje', 'Vínculo registrado y mascota actualizada correctamente.');
+
+                    }
                 } else {
                     session()->setFlashdata('mensaje', 'Error: No se pudo registrar el vínculo o actualizar la mascota.');
                 }

@@ -49,13 +49,15 @@ class Mascotas extends BaseController
                 ]
             ],
             'edad' => [
-                'rules' => 'required|integer|greater_than[0]',
+                'rules' => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[20]',
                 'errors' => [
                     'required' => 'El campo edad es obligatorio.',
                     'integer' => 'La edad debe ser un número entero.',
-                    'greater_than' => 'La edad debe ser mayor que 0.'
+                    'greater_than_equal_to' => 'La edad debe ser mayor o igual a 0.',
+                    'less_than_equal_to' => 'La edad debe ser menor o igual a 20.'
                 ]
             ],
+
         ];
 
         if (!$this->validate($reglas)) {
@@ -154,12 +156,15 @@ class Mascotas extends BaseController
                 ]
             ],
             'edad' => [
-                'rules' => 'required|integer',
+                'rules' => 'required|integer|greater_than_equal_to[0]|less_than_equal_to[20]',
                 'errors' => [
-                    'required' => 'El teléfono es obligatorio.',
-                    'regex_match' => 'Formato de teléfono inválido. Debe contener entre 7 y 15 dígitos, con opcional "+".'
+                    'required' => 'El campo edad es obligatorio.',
+                    'integer' => 'La edad debe ser un número entero.',
+                    'greater_than_equal_to' => 'La edad debe ser mayor o igual a 0.',
+                    'less_than_equal_to' => 'La edad debe ser menor o igual a 20.'
                 ]
             ],
+
         ];
         if (!$this->validate($reglas)) {
             return redirect()->to(base_url('modificarMascota'))
@@ -168,7 +173,7 @@ class Mascotas extends BaseController
         } else {
 
             if (!empty($mascotaId)) {
-               
+
                 $resultado = $mascotasModel->set([
                     'nombre' => $nombre,
                     'especie' => $especie,
